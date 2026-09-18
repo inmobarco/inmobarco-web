@@ -1,0 +1,11 @@
+node_modules
+.nuxt
+.output
+.git
+.env
+.env.*
+!.env.example
+*.log
+docs
+inmobarco-home-mockup.html
+MANUAL_IMPLEMENTACION_INMOBARCO_WEB.md

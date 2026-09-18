@@ -1,0 +1,61 @@
+@import 'tailwindcss';
+@import './tokens.css';
+
+/**
+ * Base — manual §4.4, §4.5 y §10.
+ * Nada de estilos de componente aquí: los componentes viven en app/components.
+ */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--color-neutral-0);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Titulares: Archivo ancho y macizo, el gesto propio del sitio (§4.4). */
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-stretch: 110%;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  /* Precios, áreas y tablas alineados en columna (§4.4). */
+  table,
+  [data-numeric] {
+    font-variant-numeric: tabular-nums;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+  }
+
+  /* Foco visible en todo interactivo (§10). */
+  :focus-visible {
+    outline: 3px solid var(--color-secondary);
+    outline-offset: 2px;
+  }
+}
+
+/* Quien pide menos movimiento no recibe ninguno (§10). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,80 @@
+/**
+ * Tokens de marca Inmobarco — manual §4.1.
+ *
+ * Van dentro de `@theme` y no de `:root` porque Tailwind v4 lee el tema desde aquí:
+ * emite exactamente las mismas custom properties en `:root` y además genera las
+ * utilidades (`bg-primary-600`, `text-ink`, `shadow-md`, `rounded-lg`, `font-display`).
+ * Los valores son los del manual, sin tocar.
+ */
+@theme {
+  /* Marca oficial */
+  --color-primary: #48BFF7;
+  --color-secondary: #1B99D3;
+  --color-ink: #141F21;
+  --color-line: #D2D9E0;
+  --color-surface: #F1FAFE;
+
+  /* Escala primaria */
+  --color-primary-50: #ECF9FE;
+  --color-primary-100: #D3F0FD;
+  --color-primary-200: #A9E2FB;
+  --color-primary-300: #7BD1F9;
+  --color-primary-400: #48BFF7;
+  --color-primary-500: #23A9EE;
+  --color-primary-600: #1B99D3;
+  --color-primary-700: #1878AC;
+  --color-primary-800: #17607A;
+  --color-primary-900: #143F50;
+  --color-primary-950: #141F21;
+
+  /* Neutros */
+  --color-neutral-0: #FFFFFF;
+  --color-neutral-50: #F1FAFE;
+  --color-neutral-100: #E7EDF1;
+  --color-neutral-200: #D2D9E0;
+  --color-neutral-400: #9AA6AE;
+  --color-neutral-600: #5A6670;
+  --color-neutral-800: #263238;
+  --color-neutral-900: #141F21;
+
+  /* Alias de texto secundario, usado como `text-muted` */
+  --color-muted: #5A6670;
+
+  /* Semánticos */
+  --color-success: #1F9D6B;
+  --color-success-bg: #E6F6EF;
+  --color-warning: #E0A100;
+  --color-warning-bg: #FBF3DC;
+  --color-error: #D64545;
+  --color-error-bg: #FBE9E9;
+  --color-info: #1B99D3;
+  --color-info-bg: #E7F4FB;
+
+  /* Radios */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+
+  /* Sombras */
+  --shadow-sm: 0 1px 2px rgba(20, 31, 33, 0.06);
+  --shadow-md: 0 4px 12px rgba(20, 31, 33, 0.08);
+  --shadow-lg: 0 12px 32px rgba(20, 31, 33, 0.12);
+
+  /* Tipografía (§4.4) */
+  --font-display: 'Archivo', system-ui, sans-serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+
+  /* Escala tipográfica ratio 1.25 (§4.4) */
+  --text-xs: 0.75rem;    /* 12 */
+  --text-sm: 0.875rem;   /* 14 */
+  --text-base: 1rem;     /* 16 */
+  --text-lg: 1.25rem;    /* 20 */
+  --text-xl: 1.5625rem;  /* 25 */
+  --text-2xl: 1.9375rem; /* 31 */
+  --text-3xl: 2.4375rem; /* 39 */
+  --text-4xl: 3.0625rem; /* 49 */
+  --text-5xl: 3.8125rem; /* 61 */
+
+  /* Contenedor de 1200 px: `max-w-page` (§4.5) */
+  --container-page: 1200px;
+}

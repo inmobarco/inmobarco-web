@@ -1,0 +1,8 @@
+# pnpm 12 no ejecuta scripts de instalación salvo que se aprueben aquí.
+# sharp y @tailwindcss/oxide se declaran por adelantado: en Linux (la imagen de
+# Docker) sí traen script, aunque en Windows no lo hayan pedido.
+allowBuilds:
+  esbuild: true
+  unrs-resolver: true
+  sharp: true
+  '@tailwindcss/oxide': true
