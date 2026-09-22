@@ -8,7 +8,11 @@ const props = withDefaults(defineProps<{
   block?: boolean
   /** Ruta interna. Usa NuxtLink y aprovecha el prefetch. */
   to?: string
-  /** URL externa. Añade target, rel y el aviso para lectores de pantalla (§6.2). */
+  /**
+   * URL externa. Si es http(s) se abre en pestaña nueva con el aviso para
+   * lectores de pantalla (§6.2); `tel:` y `mailto:` se dejan tal cual, porque
+   * abrirlos en otra pestaña solo deja una pestaña en blanco.
+   */
   href?: string
   type?: 'button' | 'submit' | 'reset'
   disabled?: boolean
@@ -21,6 +25,8 @@ const props = withDefaults(defineProps<{
 })
 
 const tag = computed(() => (props.to ? resolveComponent('NuxtLink') : props.href ? 'a' : 'button'))
+
+const opensNewTab = computed(() => Boolean(props.href && /^https?:\/\//.test(props.href)))
 
 const variantClass: Record<Variant, string> = {
   // El texto sobre el primario siempre es ink, nunca blanco (§4.2, CERRADO): 8.1:1.
@@ -46,8 +52,8 @@ const sizeClass: Record<Size, string> = {
     :href="href"
     :type="tag === 'button' ? type : undefined"
     :disabled="tag === 'button' ? disabled : undefined"
-    :target="href ? '_blank' : undefined"
-    :rel="href ? 'noopener noreferrer' : undefined"
+    :target="opensNewTab ? '_blank' : undefined"
+    :rel="opensNewTab ? 'noopener noreferrer' : undefined"
     :aria-disabled="disabled || undefined"
     class="inline-flex items-center justify-center gap-2 rounded-sm border font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50"
     :class="[
@@ -57,6 +63,6 @@ const sizeClass: Record<Size, string> = {
     ]"
   >
     <slot />
-    <span v-if="href" class="sr-only">(abre en una nueva pestaña)</span>
+    <span v-if="opensNewTab" class="sr-only">(abre en una nueva pestaña)</span>
   </component>
 </template>

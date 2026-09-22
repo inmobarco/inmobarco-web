@@ -14,6 +14,20 @@ export default defineNuxtConfig({
     'nuxt-security',
   ],
 
+  app: {
+    head: {
+      htmlAttrs: { lang: 'es-CO' },
+      link: [
+        // El isotipo oficial es un PNG de dos tintas, así que no hay favicon en SVG:
+        // se sirven mapas de bits en cada tamaño y el .ico como respaldo antiguo.
+        { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32.png' },
+        { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16.png' },
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+        { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
+      ],
+    },
+  },
+
   css: ['~/assets/css/main.css'],
 
   // Sin prefijo de carpeta: el componente de `components/ui/BaseButton.vue` se usa
@@ -64,6 +78,12 @@ export default defineNuxtConfig({
     enabled: false,
   },
 
+  // Las URL las arma el servidor a partir del diccionario y del inventario vivo.
+  sitemap: {
+    sources: ['/api/__sitemap__/urls'],
+    exclude: ['/test-inventario'],
+  },
+
   fonts: {
     defaults: {
       subsets: ['latin', 'latin-ext'],
@@ -85,7 +105,11 @@ export default defineNuxtConfig({
   // /preguntas-frecuentes, /propietarios y /legal/** a medida que existan las páginas
   // (§6.3). Una regla de prerender sobre una ruta inexistente rompe el build.
   routeRules: {
-    '/': { prerender: true },
+    // El §6.3 pide prerender en la home, pero desde que muestra destacados y
+    // contadores por municipio trae inventario vivo: congelarla en el build la
+    // dejaría desactualizada hasta el siguiente despliegue, y obligaría a tener
+    // las credenciales de Wasi en tiempo de build. Va con SWR como los listados.
+    '/': { swr: 900 },
     '/arriendo/**': { swr: 900 },
     '/venta/**': { swr: 900 },
     '/inmueble/**': { swr: 3600 },
