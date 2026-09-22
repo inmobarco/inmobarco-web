@@ -234,14 +234,138 @@ Los mosaicos de zona usan los degradados CSS del mockup en lugar de foto por mun
 §7.1 pide foto, pero nadie las ha entregado y ninguna fase se hace cargo de producirlas. Es
 preferible un marcador honesto a una foto de banco de imágenes que no es del sitio que dice ser.
 
+## 2026-09-22 — Contenido estático y dos fallos encontrados
+
+### 25. El eje de ancho de Archivo no se estaba aplicando (pendiente resuelto)
+
+`@nuxt/fonts` servía Archivo con `font-stretch: 100%` fijo, así que el
+`font-stretch: 110%` de los titulares (§4.4, **CERRADO**) no hacía **nada**: todos los
+titulares del sitio salían en ancho normal y el gesto tipográfico de la marca no existía.
+
+La causa: el módulo no sabe pedir el eje `wdth`. Las opciones de unifont
+(`ResolveFontOptions`) solo cubren pesos, estilos, subconjuntos y formatos. No hay manera de
+configurarlo.
+
+Solución: Archivo variable autohospedada a mano en `public/fonts/`, con `@font-face` propio y
+`font-stretch: 62.5% 125%`, que es el rango real de la fuente. En `nuxt.config` se le dice al
+módulo que no la toque (`provider: 'none'`); Inter la sigue resolviendo él. Verificado en el
+CSS del build: el `110%` cae ahora dentro del rango declarado.
+
+### 26. El token de Wasi se escribía en los logs del servidor
+
+Los errores de `ofetch` traen la URL completa **con su query string** dentro del mensaje, así
+que `console.error(error.message)` imprimía el token en claro. Se vio al primer timeout real:
+
+```
+[wasi] fallo en property/search: [GET] "https://api.wasi.co/v1/property/search?id_company=…&wasi_token=…"
+```
+
+En producción eso va a los logs del contenedor, que en Easypanel ve cualquiera con acceso al
+panel. `server/utils/wasi.ts` ahora tacha `wasi_token` e `id_company` antes de escribir nada.
+El comentario que decía que el token nunca entraba al log era falso; ahora es cierto.
+
+**Para Inmobarco:** el token quedó escrito en logs locales de desarrollo (ya borrados). No
+salió de la máquina, pero si se quiere ser estricto, rotarlo en Wasi es barato.
+
+### 27. El sitemap puede cachear una versión coja
+
+Ese timeout dejó el sitemap con 25 URLs en vez de 144: el generador degrada a solo listados si
+Wasi falla, y el módulo cachea el resultado diez minutos. Mitigado con
+`searchPropertiesBulk`, una variante con 30 s de espera en vez de 10, porque nadie está
+mirando esa respuesta en pantalla. Si aun así falla, el log lo grita.
+
+### 28. Páginas de contenido con relleno declarado
+
+Las once páginas que el header y el footer ya enlazaban existían como enlaces rotos. Ahora
+existen, se prerenderizan y funcionan, pero su texto es estructura, no contenido:
+
+- `shared/data/pages.ts` y `shared/data/legal-documents.ts` guardan el texto con un campo
+  `pending`. Mientras sea `true`, la página muestra un aviso visible, sale `noindex` y **queda
+  fuera del sitemap** — la exclusión se deriva del mismo dato, no de una lista a mano.
+- Las cinco páginas legales llevan solo la estructura que cada documento debe tener. Son
+  documentos con efecto jurídico: el texto lo pone Inmobarco o su abogado.
+- Cuando llegue el contenido real basta reemplazar el texto y poner `pending: false`. No hay
+  que tocar código.
+
+`/legal/**` en `routeRules` no basta para prerenderizar una ruta dinámica: las rutas concretas
+se derivan del diccionario en `nitro.prerender.routes`.
+
+### 29. Página de error propia y OG por defecto
+
+- `app/error.vue` cubre 404 y 5xx con la marca y salidas útiles. Antes se veía la pantalla por
+  defecto de Nuxt, en inglés y con su logo.
+- `public/og-default.png` se compone del logotipo oficial, sin renderizar texto: al compartir
+  cualquier enlace ya aparece imagen. Las OG por página siguen siendo fase 3.
+- Se eliminó `/test-inventario`, que era andamio de la fase 0.
+
+### 30. Primer contenido real de Inmobarco (22-09-2026)
+
+Entregados y publicados: **Sobre nosotros** (quiénes somos, misión, visión y seis valores) y la
+**política de tratamiento de datos**, transcrita de `inmobarco.com/main-contenido-cat-6.htm`,
+que es la versión vigente. Las tres páginas —`/nosotros`, `/contacto` y
+`/legal/tratamiento-de-datos`— pasaron a `pending: false` y con eso entraron solas al índice y
+al sitemap, sin tocar código. El horario de atención de `/contacto` sale de esa misma política,
+que es la fuente oficial.
+
+Del texto de Nosotros solo se corrigió puntuación (un «profe sionales» partido y los dos puntos
+que separan cada valor de su explicación). La política no se tocó: es un documento con efecto
+jurídico y cualquier cambio de fondo lo decide Inmobarco.
+
+**Discrepancias detectadas, sin resolver:**
+
+- **Teléfonos.** La política publicada da `302 598 9760` y `304 525 8750`. El manual (§7.5), el
+  footer, la barra superior y el enlace de WhatsApp usan `+57 302 315 7535`. Son tres números
+  distintos y ahora conviven en el mismo sitio.
+- **Dirección.** La política dice «Poblado CRA 42 # 05-145 Edificio We Work»; el manual dice
+  «Carrera 42 N.° 5 Sur – 145, Oficina 11-109». Parece el mismo edificio con distinta notación,
+  pero el footer y la política no dicen lo mismo.
+- **Fecha de la política.** La página publicada no la trae, así que `updatedAt` queda vacío y la
+  ficha del documento no muestra «Actualizada el…». Un documento legal sin fecha de vigencia es
+  un flanco débil.
+
+Recordatorio del §13: con la política publicada ya no basta. **El aviso de privacidad sigue
+pendiente, así que los formularios todavía no pueden salir a producción.**
+
+### 31. Dos canales de contacto, no uno (22-09-2026)
+
+Inmobarco confirmó que atiende por dos vías distintas y que **no deben mezclarse**:
+
+| | Teléfono | Correo |
+|---|---|---|
+| **Comercial** — arriendo, venta, visitas, consignación | +57 304 525 8750 | comercial@inmobarco.com |
+| **Administrativo y legal** — PQRS, habeas data, trámites | +57 302 315 7535 | administrativo@inmobarco.com |
+
+`shared/data/legal.ts` los separa en `CONTACT.commercial` y `CONTACT.legal`. El comercial es el
+que ve el visitante —barra superior, pie, fichas, CTA de la home y de propietarios—, porque es
+para lo que existe la página. El administrativo aparece solo en PQRS y en los documentos legales.
+
+También se corrigieron **dirección** (Carrera 47B #17B Sur – 25, Local 102, Edificio Fuente
+Azul, Santa María de los Ángeles) y **horario** (lunes a viernes 8:00–16:00, sábados 8:00–12:00).
+Ambos viven en un solo sitio y el pie, la página de contacto y la política los leen de ahí, así
+que no pueden volver a decir cosas distintas. La dirección del §7.5 del manual estaba
+desactualizada.
+
+**El WhatsApp pasa al número comercial** (`wa.me/573045258750`), confirmado por Inmobarco: quien
+escribe desde el sitio pregunta por arriendos y ventas. Esto **desvía del §6.2**, que fija
+`wa.me/573023157535` como CERRADO. Hay que avisar a quien mantenga Barquito: el flujo que
+identifica el inmueble por el código del mensaje (§14) tiene que escuchar en la línea comercial,
+no en la administrativa.
+
+**La política publicada en inmobarco.com queda obsoleta a propósito.** Tiene otros teléfonos, la
+dirección vieja y horario hasta las 5. Inmobarco confirmó que los datos buenos son los de aquí y
+que el documento viejo se ignora: este sitio lo reemplaza.
+
+La política quedó fechada el **15 de enero de 2026** y `DATA_POLICY_VERSION` pasó de `2026-09` a
+`2026-01`, que es la versión real a la que el usuario da su consentimiento (§8.2).
+
+Detalle que costó un rato: `new Date('2026-01-15')` es medianoche **UTC**, así que formateado en
+hora de Colombia mostraba el 14 de enero. Se formatea en UTC, que es la fecha que el dato
+representa.
+
 ## Pendientes de verificar
 
 - **Destacados de la home** — decisión de producto pendiente (ver punto 9).
 - **Slug de tipo `oficinas`** en el §6.1 — sin inventario que lo respalde (ver punto 10).
-- **Eje de ancho de Archivo.** El mockup carga la fuente variable con los ejes `wdth,wght`
-  (`100..125, 400..700`) porque el `font-stretch: 110%` del §4.4 depende de ello. Falta
-  comprobar que `@nuxt/fonts` autohospede la variable con el eje `wdth` y no una estática; si no,
-  habrá que declarar el `@font-face` a mano sobre el archivo woff2.
 - **Lockup horizontal del logo.** El archivo entregado apila marca y palabra en un lienzo
   cuadrado, que a 74 px de alto de cabecera no sirve. Hoy la cabecera compone isotipo oficial +
   "inmobarco" escrito en Archivo, que **no** es la tipografía del logotipo oficial. Hace falta

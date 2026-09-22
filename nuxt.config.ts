@@ -1,4 +1,6 @@
 import tailwindcss from '@tailwindcss/vite'
+import { LEGAL_DOCUMENTS } from './shared/data/legal-documents'
+import { CONTENT_PAGES, FAQ } from './shared/data/pages'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -79,9 +81,15 @@ export default defineNuxtConfig({
   },
 
   // Las URL las arma el servidor a partir del diccionario y del inventario vivo.
+  // Las páginas con contenido pendiente salen `noindex`, así que tampoco entran
+  // al sitemap: pedirle a Google que rastree lo que no debe indexar es ruido.
   sitemap: {
     sources: ['/api/__sitemap__/urls'],
-    exclude: ['/test-inventario'],
+    exclude: [
+      ...CONTENT_PAGES.filter(page => page.content.pending).map(page => page.path),
+      ...(FAQ.page.pending ? ['/preguntas-frecuentes'] : []),
+      ...LEGAL_DOCUMENTS.filter(document => document.pending).map(document => `/legal/${document.slug}`),
+    ],
   },
 
   fonts: {
@@ -90,7 +98,9 @@ export default defineNuxtConfig({
       styles: ['normal'],
     },
     families: [
-      { name: 'Archivo', provider: 'google', weights: ['400 700'] },
+      // Archivo se declara a mano en app/assets/css/main.css, con el eje de ancho
+      // que este módulo no sabe pedir. Aquí solo se le dice que no la toque.
+      { name: 'Archivo', provider: 'none' },
       { name: 'Inter', provider: 'google', weights: [400, 500, 600, 700] },
     ],
   },
@@ -101,10 +111,16 @@ export default defineNuxtConfig({
     rateLimiter: false,
   },
 
-  // TODO: añadir `prerender: true` en /nosotros, /aliados, /contacto, /pqrs,
-  // /preguntas-frecuentes, /propietarios y /legal/** a medida que existan las páginas
-  // (§6.3). Una regla de prerender sobre una ruta inexistente rompe el build.
   routeRules: {
+    // Páginas de contenido: se generan en el build y se sirven como estáticas (§6.3).
+    '/nosotros': { prerender: true },
+    '/aliados': { prerender: true },
+    '/contacto': { prerender: true },
+    '/pqrs': { prerender: true },
+    '/preguntas-frecuentes': { prerender: true },
+    '/propietarios': { prerender: true },
+    '/legal/**': { prerender: true },
+
     // El §6.3 pide prerender en la home, pero desde que muestra destacados y
     // contadores por municipio trae inventario vivo: congelarla en el build la
     // dejaría desactualizada hasta el siguiente despliegue, y obligaría a tener
@@ -117,5 +133,12 @@ export default defineNuxtConfig({
 
   nitro: {
     preset: 'node-server',
+
+    prerender: {
+      // `/legal/**` en routeRules no basta: el prerenderizador necesita rutas
+      // concretas, y estas salen de una ruta dinámica. Se derivan del mismo
+      // diccionario que las pinta, para que no se puedan desincronizar.
+      routes: LEGAL_DOCUMENTS.map(document => `/legal/${document.slug}`),
+    },
   },
 })

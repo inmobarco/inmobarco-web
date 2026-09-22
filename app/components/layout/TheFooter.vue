@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { EXTERNAL_LINKS } from '#shared/data/links'
-import { COMPANY, LEGAL_PAGES, RENTAL_REGISTRATIONS } from '#shared/data/legal'
+import { COMPANY, CONTACT, LEGAL_PAGES, OPENING_HOURS, RENTAL_REGISTRATIONS } from '#shared/data/legal'
 
 const year = new Date().getFullYear()
 
@@ -77,13 +77,51 @@ const companyLinks = [
           </div>
           <address class="mt-6 flex flex-col gap-1 text-sm text-muted not-italic">
             <span>{{ COMPANY.address }}</span>
+            <span>{{ COMPANY.addressDetail }}</span>
             <span>{{ COMPANY.city }}</span>
-            <a :href="COMPANY.phoneHref" data-numeric class="hover:text-ink">{{ COMPANY.phone }}</a>
-            <a :href="`mailto:${COMPANY.email}`" class="hover:text-ink">{{ COMPANY.email }}</a>
-            <a :href="`mailto:${COMPANY.maintenanceEmail}`" class="hover:text-ink">
-              {{ COMPANY.maintenanceEmail }}
-            </a>
+            <span class="mt-2">{{ OPENING_HOURS.text }}</span>
           </address>
+
+          <!-- Dos canales distintos: el comercial es el del negocio, el
+               administrativo el de trámites y asuntos legales (§7.5). -->
+          <dl class="mt-6 flex flex-col gap-3 text-sm text-muted">
+            <div>
+              <dt class="text-xs font-semibold">
+                Comercial
+              </dt>
+              <dd class="mt-0.5 flex flex-col">
+                <a :href="CONTACT.commercial.phoneHref" data-numeric class="hover:text-ink">
+                  {{ CONTACT.commercial.phone }}
+                </a>
+                <a :href="`mailto:${CONTACT.commercial.email}`" class="hover:text-ink">
+                  {{ CONTACT.commercial.email }}
+                </a>
+              </dd>
+            </div>
+            <div>
+              <dt class="text-xs font-semibold">
+                Administrativo
+              </dt>
+              <dd class="mt-0.5 flex flex-col">
+                <a :href="CONTACT.legal.phoneHref" data-numeric class="hover:text-ink">
+                  {{ CONTACT.legal.phone }}
+                </a>
+                <a :href="`mailto:${CONTACT.legal.email}`" class="hover:text-ink">
+                  {{ CONTACT.legal.email }}
+                </a>
+              </dd>
+            </div>
+            <div>
+              <dt class="text-xs font-semibold">
+                Mantenimiento
+              </dt>
+              <dd class="mt-0.5">
+                <a :href="`mailto:${CONTACT.maintenance.email}`" class="hover:text-ink">
+                  {{ CONTACT.maintenance.email }}
+                </a>
+              </dd>
+            </div>
+          </dl>
         </div>
       </div>
 

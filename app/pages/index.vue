@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { COMPANY } from '#shared/data/legal'
+import { COMPANY, CONTACT, OPENING_HOURS } from '#shared/data/legal'
 import { EXTERNAL_LINKS } from '#shared/data/links'
 
 const site = useSiteConfig()
@@ -18,10 +18,10 @@ useSchemaOrg([
     alternateName: 'Inmobarco',
     taxID: COMPANY.nit,
     logo: '/brand/icon-512.png',
-    telephone: COMPANY.phone,
-    email: COMPANY.email,
+    telephone: CONTACT.commercial.phone,
+    email: CONTACT.commercial.email,
     address: {
-      streetAddress: COMPANY.address,
+      streetAddress: `${COMPANY.address}, ${COMPANY.addressDetail}`,
       addressLocality: 'Medellín',
       addressRegion: 'Antioquia',
       addressCountry: 'CO',
@@ -31,12 +31,13 @@ useSchemaOrg([
     '@type': 'RealEstateAgent',
     'name': 'Inmobarco Inmobiliaria',
     'url': site.url,
-    'telephone': COMPANY.phone,
-    'email': COMPANY.email,
+    'telephone': CONTACT.commercial.phone,
+    'email': CONTACT.commercial.email,
     'areaServed': ['Medellín', 'Envigado', 'Sabaneta', 'Itagüí', 'La Estrella'],
+    'openingHours': OPENING_HOURS.schema,
     'address': {
       '@type': 'PostalAddress',
-      'streetAddress': COMPANY.address,
+      'streetAddress': `${COMPANY.address}, ${COMPANY.addressDetail}`,
       'addressLocality': 'Medellín',
       'addressRegion': 'Antioquia',
       'addressCountry': 'CO',

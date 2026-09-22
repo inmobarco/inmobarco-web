@@ -17,7 +17,19 @@ export type WasiQuery = Record<string, string | number | boolean | undefined>
  * Única puerta de salida hacia Wasi. Las credenciales salen de `runtimeConfig`
  * privado y no existen fuera del proceso de Nitro (manual §5.1).
  */
-async function callWasi<T>(path: string, query: WasiQuery = {}): Promise<T> {
+/**
+ * Los errores de `ofetch` traen la URL completa dentro del mensaje, **con la query**,
+ * así que un simple `console.error(error.message)` escupe el token en los logs del
+ * contenedor. Se tacha antes de escribir nada.
+ */
+function redact(value: unknown): string {
+  const text = value instanceof Error ? value.message : String(value)
+  return text
+    .replace(/(wasi_token=)[^&"'\s)]*/gi, '$1<oculto>')
+    .replace(/(id_company=)[^&"'\s)]*/gi, '$1<oculto>')
+}
+
+async function callWasi<T>(path: string, query: WasiQuery = {}, timeout = 10_000): Promise<T> {
   const config = useRuntimeConfig()
   const { idCompany, token } = config.wasi
 
@@ -36,13 +48,12 @@ async function callWasi<T>(path: string, query: WasiQuery = {}): Promise<T> {
       method: 'GET',
       query: params,
       headers: { Accept: 'application/json' },
-      timeout: 10_000,
+      timeout,
       retry: 1,
     })
   }
   catch (error) {
-    // El token nunca entra en el log: solo la ruta y el motivo.
-    console.error(`[wasi] fallo en ${path}:`, error instanceof Error ? error.message : error)
+    console.error(`[wasi] fallo en ${path}:`, redact(error))
     throw createError({ statusCode: 503, statusMessage: 'Wasi no respondió' })
   }
 }
@@ -65,6 +76,18 @@ export const searchProperties = defineCachedFunction(
   async (query: WasiQuery): Promise<WasiSearchResponse> =>
     callWasi<WasiSearchResponse>('property/search', query),
   { maxAge: 900, name: 'wasi-search', getKey: cacheKey },
+)
+
+/**
+ * Igual que `searchProperties`, pero con más paciencia. Las páginas de 100
+ * inmuebles que arma el sitemap tardan más de los 10 s del cliente normal cuando
+ * Wasi está en frío, y quedarse sin las fichas deja un sitemap cojo cacheado diez
+ * minutos. Nadie está esperando esta respuesta en pantalla, así que puede esperar.
+ */
+export const searchPropertiesBulk = defineCachedFunction(
+  async (query: WasiQuery): Promise<WasiSearchResponse> =>
+    callWasi<WasiSearchResponse>('property/search', query, 30_000),
+  { maxAge: 900, name: 'wasi-search-bulk', getKey: cacheKey },
 )
 
 export const getProperty = defineCachedFunction(

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { whatsappLink } from '#shared/data/links'
-import { COMPANY } from '#shared/data/legal'
+import { CONTACT } from '#shared/data/legal'
 </script>
 
 <template>
@@ -19,8 +19,8 @@ import { COMPANY } from '#shared/data/legal'
         <BaseButton :href="whatsappLink()" size="lg">
           Escribir por WhatsApp
         </BaseButton>
-        <BaseButton :href="COMPANY.phoneHref" variant="onInk" size="lg">
-          Llamar al {{ COMPANY.phone.replace('+57 ', '') }}
+        <BaseButton :href="CONTACT.commercial.phoneHref" variant="onInk" size="lg">
+          Llamar al {{ CONTACT.commercial.phone.replace('+57 ', '') }}
         </BaseButton>
       </div>
     </div>

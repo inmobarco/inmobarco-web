@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { EXTERNAL_LINKS } from '#shared/data/links'
-import { COMPANY } from '#shared/data/legal'
+import { CONTACT } from '#shared/data/legal'
 </script>
 
 <template>
   <div class="bg-ink text-[0.8125rem] text-white/80">
     <div class="mx-auto flex min-h-[38px] max-w-page items-center justify-between gap-4 px-4 md:px-6">
       <div class="hidden gap-6 md:flex">
-        <a :href="COMPANY.phoneHref" class="whitespace-nowrap hover:text-white">{{ COMPANY.phone }}</a>
-        <a :href="`mailto:${COMPANY.email}`" class="whitespace-nowrap hover:text-white">{{ COMPANY.email }}</a>
+        <a :href="CONTACT.commercial.phoneHref" class="whitespace-nowrap hover:text-white">{{ CONTACT.commercial.phone }}</a>
+        <a :href="`mailto:${CONTACT.commercial.email}`" class="whitespace-nowrap hover:text-white">{{ CONTACT.commercial.email }}</a>
       </div>
 
       <div class="ml-auto flex items-center gap-2">

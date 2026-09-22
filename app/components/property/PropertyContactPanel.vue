@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Property } from '#shared/types/property'
 import { whatsappLink } from '#shared/data/links'
-import { COMPANY } from '#shared/data/legal'
+import { CONTACT } from '#shared/data/legal'
 
 const props = defineProps<{ property: Property }>()
 
@@ -50,8 +50,8 @@ const priceLines = computed(() => {
         <BaseButton :href="whatsapp" variant="ghost" block>
           Escribir por WhatsApp
         </BaseButton>
-        <BaseButton :href="COMPANY.phoneHref" variant="ghost" block>
-          Llamar {{ COMPANY.phone }}
+        <BaseButton :href="CONTACT.commercial.phoneHref" variant="ghost" block>
+          Llamar {{ CONTACT.commercial.phone }}
         </BaseButton>
       </div>
 
