@@ -1,16 +1,29 @@
 <script setup lang="ts">
 import type { ZoneCount } from '../../../server/api/properties/counts.get'
 
+/**
+ * Se sigue consultando el conteo, pero ya no se muestra: sirve para no enlazar a
+ * un municipio que hoy está sin inventario, que sería mandar a un listado vacío.
+ */
 const { data: zones } = await useFetch<ZoneCount[]>('/api/properties/counts')
 
-const { formatNumber } = useFormatters()
-
 /**
- * Fachadas de degradado en vez de foto, como en el mockup. Inmobarco no ha
- * entregado fotos por municipio (el manual tampoco se las encarga a ninguna fase),
- * y es mejor un marcador honesto que una foto de banco de imágenes que no es del
- * sitio que dice ser.
+ * Imágenes de `app/assets/images/zonas/`, resueltas al construir. Basta con dejar
+ * el archivo con el nombre del slug del municipio: aparece solo, sin tocar código.
+ * El que no tenga foto cae al degradado de marca.
  */
+const files = import.meta.glob<string>(
+  '../../assets/images/zonas/*.{jpg,jpeg,png,webp}',
+  { eager: true, import: 'default', query: '?url' },
+)
+
+const zoneImages = Object.fromEntries(
+  Object.entries(files).map(([path, url]) => [
+    path.split('/').pop()!.replace(/\.[^.]+$/, ''),
+    url,
+  ]),
+)
+
 const facades = [
   'from-primary-200 to-primary-500',
   'from-primary-300 to-primary-700',
@@ -38,19 +51,25 @@ const facades = [
           :to="`/arriendo/${zone.slug}`"
           class="relative isolate flex aspect-3/4 items-end overflow-hidden rounded-lg p-4 text-white"
         >
+          <img
+            v-if="zoneImages[zone.slug]"
+            :src="zoneImages[zone.slug]"
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+            class="absolute inset-0 -z-2 h-full w-full object-cover"
+          >
           <span
+            v-else
             class="absolute inset-0 -z-2 bg-linear-155"
             :class="facades[index % facades.length]"
           />
-          <span
-            class="absolute inset-0 -z-1 bg-linear-to-t from-ink/85 via-ink/20 to-transparent"
-          />
-          <span class="relative">
-            <strong class="block font-display text-[1.05rem] font-bold">{{ zone.name }}</strong>
-            <span data-numeric class="text-[0.8125rem] text-white/80">
-              {{ formatNumber(zone.total) }} {{ zone.total === 1 ? 'inmueble' : 'inmuebles' }}
-            </span>
-          </span>
+
+          <span class="absolute inset-0 -z-1 bg-linear-to-t from-ink/85 via-ink/25 to-transparent" />
+
+          <strong class="relative font-display text-[1.05rem] font-bold">
+            {{ zone.name }}
+          </strong>
         </NuxtLink>
       </li>
     </ul>

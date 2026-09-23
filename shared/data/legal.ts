@@ -26,6 +26,9 @@ export const OPENING_HOURS = {
  *   para lo que existe esta página.
  * - `legal` es el administrativo: PQRS, habeas data, ejercicio de derechos sobre
  *   datos personales. Solo aparece en las páginas legales y en los trámites.
+ *
+ * El correo de mantenimiento se retiró de la interfaz por decisión de Inmobarco
+ * (23-09-2026): las novedades entran por PQRS, que sí deja constancia.
  */
 export const CONTACT = {
   commercial: {
@@ -39,10 +42,6 @@ export const CONTACT = {
     phone: '+57 302 315 7535',
     phoneHref: 'tel:+573023157535',
     email: 'administrativo@inmobarco.com',
-  },
-  maintenance: {
-    label: 'Mantenimiento',
-    email: 'mantenimiento@inmobarco.com',
   },
 } as const
 

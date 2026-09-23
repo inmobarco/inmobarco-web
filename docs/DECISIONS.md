@@ -362,6 +362,51 @@ Detalle que costó un rato: `new Date('2026-01-15')` es medianoche **UTC**, así
 hora de Colombia mostraba el 14 de enero. Se formatea en UTC, que es la fecha que el dato
 representa.
 
+## 2026-09-23 — Ajustes de interfaz pedidos por Inmobarco
+
+### 32. Foto real en el hero, en vez de la ilustración
+
+`banner.jpeg` sustituye al SVG del valle, que se eliminó. La foto traía **el logo
+incrustado** en una banda diagonal a la izquierda, justo donde va el titular y a cuarenta
+píxeles del logo de la cabecera, así que se recortó esa banda: `public/hero-home.jpg` es
+`banner.jpeg` desde el píxel 540 en adelante. El original se conserva intacto.
+
+**Resolución justa:** el recorte queda en 1060 × 900 px. IPX no amplía más allá del original,
+así que en pantallas grandes el hero se sirve desde 1060 px de ancho y se ve blando. Conviene
+una foto sin la banda de marca y de al menos 2000 px de ancho.
+
+Detalle de `@nuxt/image`: `sizes="100vw"` a secas genera un srcset absurdo (`s_1x1`, `s_2x2`).
+Hay que usar el formato por breakpoint (`sm:100vw md:100vw …`), que es el que ya usaban las
+tarjetas de inmueble.
+
+### 33. PQRS en la barra de utilidades, no como CTA de cabecera
+
+Inmobarco pidió que PQRS fuera visible y dejó el sitio a criterio propio, sugiriendo
+reemplazar con él el botón «Consigna tu inmueble». Se puso en la **barra superior**, junto a
+pagar arriendo y al área de clientes, y también en el menú móvil.
+
+No se reemplazó el CTA de la cabecera: esa barra agrupa accesos de **servicio**, mientras que
+«Consigna tu inmueble» es el botón de conversión hacia `/propietarios`, que el §7.4 llama la
+página de conversión más importante del negocio. Son dos cosas distintas y quitar la segunda
+para meter la primera cambiaría el embudo de captación de propietarios. Si Inmobarco lo quiere
+igualmente, es una línea.
+
+### 34. Mosaicos de zona: sin contadores y con foto propia
+
+Se retiró el número de inmuebles de cada municipio. El endpoint `/api/properties/counts` se
+mantiene, pero ya solo sirve para **no** enlazar a un municipio que hoy esté sin inventario.
+
+Las fotos van en `app/assets/images/zonas/`, con el nombre del slug del municipio
+(`sabaneta.jpg`, `la-estrella.jpg`…). Se resuelven al construir con `import.meta.glob`, así que
+basta dejar el archivo: aparece solo, sin tocar código, y el municipio que no tenga foto cae al
+degradado de marca. Las instrucciones están en `LEEME.md` dentro de esa carpeta.
+
+### 35. Fuera el correo de mantenimiento
+
+`mantenimiento@inmobarco.com` desaparece de la interfaz por decisión de Inmobarco: las
+novedades entran por PQRS, que deja constancia. Se eliminó también de `CONTACT`, no solo de las
+vistas. En la página de contacto, donde estaba el correo ahora hay un enlace a PQRS.
+
 ## Pendientes de verificar
 
 - **Destacados de la home** — decisión de producto pendiente (ver punto 9).

@@ -48,12 +48,12 @@ const propertyCode = computed(() => {
         </div>
         <div>
           <dt class="text-xs font-semibold text-muted">
-            Mantenimiento
+            Novedades de mantenimiento
           </dt>
           <dd class="mt-1">
-            <a :href="`mailto:${CONTACT.maintenance.email}`" class="font-semibold hover:text-secondary">
-              {{ CONTACT.maintenance.email }}
-            </a>
+            <NuxtLink to="/pqrs" class="font-semibold hover:text-secondary">
+              Radícalas por PQRS
+            </NuxtLink>
           </dd>
         </div>
         <div>

@@ -33,15 +33,33 @@ function search() {
 </script>
 
 <template>
-  <section class="relative overflow-hidden bg-surface">
-    <HeroValley />
+  <section class="relative overflow-hidden bg-ink">
+    <!--
+      Foto a sangre. Es el LCP de la home, así que va con `preload` y
+      `fetchpriority="high"` (§9.4). `hero-home.jpg` es el recorte de
+      `banner.jpeg` sin la banda de marca: el logo ya está en la cabecera.
+    -->
+    <NuxtImg
+      src="/hero-home.jpg"
+      alt=""
+      aria-hidden="true"
+      width="1600"
+      height="900"
+      sizes="sm:100vw md:100vw lg:100vw xl:100vw 2xl:100vw"
+      preload
+      fetchpriority="high"
+      class="absolute inset-0 h-full w-full object-cover"
+    />
+
+    <!-- Velo: sin él, el titular blanco se pierde sobre las zonas claras de la foto -->
+    <div class="absolute inset-0 bg-linear-to-r from-ink/90 via-ink/70 to-ink/40" />
 
     <div class="relative z-2 mx-auto max-w-page px-4 pt-16 md:px-6 md:pt-20">
       <div class="max-w-[640px]">
-        <h1 class="text-[clamp(2.2rem,5.2vw,3.9rem)]">
+        <h1 class="text-[clamp(2.2rem,5.2vw,3.9rem)] text-white">
           Encuentra dónde vivir en el Valle de Aburrá
         </h1>
-        <p class="mt-5 max-w-[48ch] text-lg text-neutral-800">
+        <p class="mt-5 max-w-[48ch] text-lg text-white/85">
           Apartamentos, casas y locales que administramos directamente. Cada inmueble lo visita
           y verifica nuestro equipo antes de publicarlo.
         </p>

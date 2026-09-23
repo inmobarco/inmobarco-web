@@ -111,16 +111,6 @@ const companyLinks = [
                 </a>
               </dd>
             </div>
-            <div>
-              <dt class="text-xs font-semibold">
-                Mantenimiento
-              </dt>
-              <dd class="mt-0.5">
-                <a :href="`mailto:${CONTACT.maintenance.email}`" class="hover:text-ink">
-                  {{ CONTACT.maintenance.email }}
-                </a>
-              </dd>
-            </div>
           </dl>
         </div>
       </div>
