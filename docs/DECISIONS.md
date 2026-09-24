@@ -407,6 +407,101 @@ degradado de marca. Las instrucciones están en `LEEME.md` dentro de esa carpeta
 novedades entran por PQRS, que deja constancia. Se eliminó también de `CONTACT`, no solo de las
 vistas. En la página de contacto, donde estaba el correo ahora hay un enlace a PQRS.
 
+## 2026-09-24 — Formulario de contacto (cierra la fase 1)
+
+### 36. Los formularios se desbloquean solos, no a mano
+
+El §13 exige que ningún formulario salga a producción antes de publicar la política de
+tratamiento **y** el aviso de privacidad. En lugar de dejarlo escrito en una lista de tareas,
+`formsArePublishable()` lo comprueba contra los propios documentos: mientras alguno siga
+`pending`, la página de contacto muestra los canales directos en vez del formulario y
+`/api/contact` responde 503. El día que llegue el aviso de privacidad, ponerle `pending: false`
+abre el formulario sin tocar nada más.
+
+Se comprueba en los dos lados a propósito. La vista decide qué pintar; la API es la que recibe
+los datos, y es la que no puede aceptarlos.
+
+### 37. Webhooks de n8n por tipo de formulario
+
+`NUXT_N8N_WEBHOOK_URL` es la base (`…/webhook/`) y cada formulario cuelga de ella:
+`web-contact`, y más adelante `web-pqrs` y `web-consign`. La evidencia de consentimiento del
+§8.2 —`policyVersion`, `acceptedAt`, IP y user-agent— la arma el servidor y viaja con cada
+envío: quien tiene que poder probar la autorización es Inmobarco, no el navegador.
+
+Verificado contra un receptor local, **sin tocar el n8n de producción**: carga útil correcta,
+cinco variantes inválidas rechazadas con 400 y ninguna entregada, y el limitador cortando al
+sexto intento (§8.4).
+
+### 38. El honeypot no puede validarse con el esquema
+
+Primera versión: el campo trampa era `z.string().max(0)`, así que un bot que lo rellenara
+recibía un **400 diciéndole exactamente qué campo lo delató**. Con eso, basta dejarlo vacío la
+próxima vez y la trampa deja de servir para siempre.
+
+Ahora el esquema lo acepta con cualquier valor y decide el servidor: con el campo relleno
+responde `{ ok: true }` con un radicado creíble y no entrega nada. Comprobado: el receptor no
+registró el envío.
+
+### 39. Turnstile queda cableado pero inactivo
+
+No hay claves en `.env`, así que `verifyTurnstile` se salta la verificación y **avisa por
+consola en cada envío**. No es un agujero silencioso: el formulario tampoco se publica sin las
+páginas legales, y las dos cosas llegan juntas. Al poner `NUXT_TURNSTILE_SECRET_KEY` se activa
+sin tocar código.
+
+## 2026-09-25 — Radicados y borradores legales
+
+### 40. Contacto sin número de radicado
+
+El formulario de contacto ya no devuelve un código: confirma con «Tu mensaje fue enviado» y
+listo. Un radicado ahí no aportaba nada y el que se generaba era aleatorio, no consecutivo.
+
+**El sitio no puede generar consecutivos** y conviene que quede escrito: no tiene dónde guardar
+un contador —el caché de Nitro es memoria del proceso y se reinicia con el contenedor—, con más
+de una réplica dos procesos darían el mismo número, y un consecutivo público deja ver el volumen
+de solicitudes que recibe la empresa. Cuando llegue PQRS, **el consecutivo lo asigna n8n**, que
+sí tiene estado, y el sitio muestra el que le devuelva. Decisión de Inmobarco del 25-09-2026.
+
+### 41. Tres estados para los documentos legales, no dos
+
+`pending` / `draft` / `published`. El intermedio existe porque un borrador redactado por Claude
+**no es** un documento aprobado, y tratarlo como tal sería justo el riesgo que el §13 evita.
+
+Solo `published` indexa la página, la mete en el sitemap y cuenta para abrir los formularios.
+Un `draft` se ve, se navega y se puede revisar, con un aviso azul bien visible encima.
+
+### 42. Cuatro borradores redactados
+
+A petición de Inmobarco se redactaron el **aviso de privacidad**, los **términos y condiciones**,
+la **política de cookies** y el **habeas data**, los cuatro en estado `draft`.
+
+Criterios con los que se escribieron:
+
+- El **aviso de privacidad** no inventa nada: cada afirmación sale de la política de tratamiento
+  ya vigente. Cubre el contenido mínimo del artículo 15 del Decreto 1377 de 2013.
+- Los **términos** describen el funcionamiento real del sitio: inventario tomado de Wasi y
+  sujeto a cambio, precios que no incluyen administración, y pagos y área de clientes operados
+  por terceros fuera de este sitio.
+- La **política de cookies** dice la verdad comprobada: **hoy el sitio no instala ni una cookie
+  ni usa almacenamiento del navegador**. Describe por separado lo que se activará más adelante.
+  Hay que actualizarla el día que entre la analítica.
+- El **habeas data** cita los plazos de los artículos 14 y 15 de la Ley 1581 de 2012 como lo que
+  son: plazos legales, no compromisos propios. Si Inmobarco quiere prometer menos, hay que
+  decirlo de forma explícita.
+
+**Aprobados por Inmobarco el 24-09-2026** y pasados a `published`. Con eso las cinco páginas
+legales entraron al índice y al sitemap, y **los formularios quedaron abiertos**: el candado del
+§13 se levantó solo, sin tocar código, que era justo lo que se buscaba al construirlo así.
+
+Lo que ese gesto deja pendiente:
+
+- **Turnstile sigue sin claves.** El antispam en producción es hoy honeypot + límite de cinco
+  envíos por IP cada diez minutos. Es razonable, pero no es lo que pide el §8.4. El servidor lo
+  avisa en cada envío: `[turnstile] sin clave configurada: el envío pasó sin verificar`.
+- **La política de cookies deja de ser cierta** el día que se encienda GA4 o Turnstile, porque
+  hoy afirma que el sitio no instala ninguna cookie. Hay que actualizarla **antes** de activar
+  cualquiera de los dos, no después.
+
 ## Pendientes de verificar
 
 - **Destacados de la home** — decisión de producto pendiente (ver punto 9).

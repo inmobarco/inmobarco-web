@@ -22,10 +22,11 @@ const updatedLabel = computed(() => {
     .format(new Date(document.value.updatedAt))
 })
 
+// Solo lo aprobado se indexa: un borrador sin revisar no debe salir en Google.
 useSeoMeta({
   title: () => document.value.title,
-  description: () => (document.value.pending ? undefined : document.value.description),
-  robots: () => (document.value.pending ? 'noindex, follow' : 'index, follow'),
+  description: () => (document.value.status === 'published' ? document.value.description : undefined),
+  robots: () => (document.value.status === 'published' ? 'index, follow' : 'noindex, follow'),
 })
 
 useHead({ link: [{ rel: 'canonical', href: () => `${site.url}${route.path}` }] })
@@ -47,7 +48,17 @@ useHead({ link: [{ rel: 'canonical', href: () => `${site.url}${route.path}` }] }
           · Versión <span data-numeric>{{ document.version }}</span>
         </p>
 
-        <PendingNotice v-if="document.pending" class="mt-8" what="el texto legal definitivo" />
+        <PendingNotice
+          v-if="document.status === 'pending'"
+          class="mt-8"
+          what="el texto legal definitivo"
+        />
+        <PendingNotice
+          v-else-if="document.status === 'draft'"
+          class="mt-8"
+          what="la revisión jurídica de este borrador"
+          tone="draft"
+        />
 
         <section v-for="section in document.sections" :key="section.heading" class="mt-10">
           <h2 :id="slugify(section.heading ?? '')" class="text-xl">

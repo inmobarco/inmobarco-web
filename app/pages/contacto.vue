@@ -2,8 +2,14 @@
 import { CONTACTO } from '#shared/data/pages'
 import { whatsappLink } from '#shared/data/links'
 import { COMPANY, CONTACT } from '#shared/data/legal'
-
 const route = useRoute()
+
+/**
+ * El §13 no deja pedir datos personales antes de publicar la política de
+ * tratamiento y el aviso de privacidad. Mientras falte alguno, la página ofrece
+ * los canales directos en vez del formulario.
+ */
+const formEnabled = useFormsEnabled()
 
 /** La ficha enlaza aquí con ?inmueble=CODIGO para que no haya que repetirlo. */
 const propertyCode = computed(() => {
@@ -73,6 +79,27 @@ const propertyCode = computed(() => {
           Escribir por WhatsApp
         </BaseButton>
       </div>
+
+      <section class="mt-12 border-t border-line pt-10">
+        <h2 class="text-xl">
+          Escríbenos
+        </h2>
+
+        <template v-if="formEnabled">
+          <p class="mt-3 text-muted">
+            Déjanos tus datos y te respondemos el siguiente día hábil.
+          </p>
+          <ContactForm class="mt-8" :property-code="propertyCode" />
+        </template>
+
+        <div v-else class="mt-4 rounded-lg border border-line bg-surface p-6">
+          <p class="text-muted">
+            El formulario en línea se habilita cuando publiquemos el aviso de privacidad.
+            Mientras tanto, escríbenos por WhatsApp o al correo comercial: se atiende igual
+            de rápido.
+          </p>
+        </div>
+      </section>
     </template>
   </ContentPage>
 </template>

@@ -56,6 +56,16 @@ export default defineNuxtConfig({
       siteUrl: '',
       turnstileSiteKey: '',
       gtagId: '',
+      /**
+       * Abre los formularios en desarrollo para poder revisarlos antes de que
+       * exista el texto legal. **Solo funciona en `pnpm dev`**: en el build de
+       * producción la condición se compila a falso, así que no hay forma de
+       * saltarse el candado del §13 en el servidor real.
+       *
+       * Booleano, no cadena: Nuxt convierte solo el `"true"` de la variable de
+       * entorno al tipo del valor por defecto.
+       */
+      formsPreview: false,
     },
   },
 
@@ -88,7 +98,7 @@ export default defineNuxtConfig({
     exclude: [
       ...CONTENT_PAGES.filter(page => page.content.pending).map(page => page.path),
       ...(FAQ.page.pending ? ['/preguntas-frecuentes'] : []),
-      ...LEGAL_DOCUMENTS.filter(document => document.pending).map(document => `/legal/${document.slug}`),
+      ...LEGAL_DOCUMENTS.filter(document => document.status !== 'published').map(document => `/legal/${document.slug}`),
     ],
   },
 
@@ -112,6 +122,14 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
+    // Antispam del §8.4: máximo 5 envíos por IP cada 10 minutos. Solo sobre los
+    // endpoints de formulario; en global estrangularía la navegación.
+    '/api/contact': {
+      security: {
+        rateLimiter: { tokensPerInterval: 5, interval: 600_000 },
+      },
+    },
+
     // Páginas de contenido: se generan en el build y se sirven como estáticas (§6.3).
     '/nosotros': { prerender: true },
     '/aliados': { prerender: true },
