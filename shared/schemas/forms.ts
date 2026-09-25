@@ -74,6 +74,61 @@ export const contactSchema = z.object({
 /** Un envío ya validado: aquí `consent` solo puede ser `true`. */
 export type ContactForm = z.infer<typeof contactSchema>
 
+// --- Consignación de inmueble (§8.3) ---
+
+export const CONSIGN_OPERATIONS = [
+  { value: 'arriendo', label: 'Para arrendar' },
+  { value: 'venta', label: 'Para vender' },
+  { value: 'ambas', label: 'Para arrendar o vender' },
+] as const
+
+export const consignSchema = z.object({
+  name,
+  email,
+  phone,
+  /** Qué quiere hacer el propietario con el inmueble. */
+  operation: z.enum(
+    CONSIGN_OPERATIONS.map(item => item.value) as [string, ...string[]],
+    'Dinos qué quieres hacer con el inmueble',
+  ),
+  /** Slug de `PROPERTY_TYPES`, u `otro` para lo que no esté en la lista. */
+  propertyType: z.string().trim().min(1, 'Elige el tipo de inmueble').max(40),
+  /** Slug de `ZONES`, u `otro`. El detalle se pide en el mensaje. */
+  zone: z.string().trim().min(1, 'Elige el municipio').max(40),
+  /**
+   * Canon o precio esperado, en pesos. Opcional a propósito: muchos propietarios
+   * no lo tienen claro, y esta es la página que más convierte del sitio. Exigirlo
+   * espanta a quien justamente necesita que le hagan el avalúo.
+   */
+  expectedPrice: z.coerce.number().int().positive().max(100_000_000_000).optional().or(z.literal('')),
+  message: z.string().trim().max(2000, 'El mensaje es demasiado largo').optional().or(z.literal('')),
+  consent,
+  website: honeypot,
+  captchaToken: z.string().optional(),
+})
+
+export type ConsignForm = z.infer<typeof consignSchema>
+
+export interface ConsignFormDraft extends Omit<ConsignForm, 'consent' | 'expectedPrice'> {
+  consent: boolean
+  expectedPrice: string
+}
+
+export function emptyConsignForm(): ConsignFormDraft {
+  return {
+    name: '',
+    email: '',
+    phone: '',
+    operation: 'arriendo',
+    propertyType: '',
+    zone: '',
+    expectedPrice: '',
+    message: '',
+    consent: false,
+    website: '',
+  }
+}
+
 /**
  * Lo que el usuario está escribiendo. `consent` es booleano porque el checkbox
  * **nace sin marcar** (§8.2, CERRADO) y solo al marcarlo el borrador pasa a ser

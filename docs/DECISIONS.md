@@ -502,6 +502,29 @@ Lo que ese gesto deja pendiente:
   hoy afirma que el sitio no instala ninguna cookie. Hay que actualizarla **antes** de activar
   cualquiera de los dos, no después.
 
+## 2026-09-25 — Formulario de consignación
+
+### 43. El formulario es el protagonista de `/propietarios`
+
+El §7.4 llama a esa página «la de conversión más importante del negocio» y pide un solo CTA
+visible por pantalla. Antes tenía únicamente un botón de WhatsApp; ahora el CTA **es** entregar
+el inmueble, y el teléfono queda al final como salida para quien prefiere hablar antes de dejar
+datos.
+
+El canon esperado se pidió **opcional** a propósito. Muchos propietarios no lo tienen claro
+—por eso piden el avalúo— y exigirlo en el campo espanta justo a quien más interesa. Si
+Inmobarco prefiere que sea obligatorio, es un cambio de una línea.
+
+A n8n le llegan los slugs y también los nombres legibles (`zoneLabel`, `propertyTypeLabel`):
+quien lea el correo no tendría por qué traducir `la-estrella` de cabeza.
+
+### 44. Dos pendientes del manual, cerrados
+
+- **§15.4, URL de Palomma:** confirmada por Inmobarco el 25-09-2026. Es la que ya estaba en
+  `EXTERNAL_LINKS`, así que no hubo cambio.
+- **Barquito:** funciona también en el 304 525 8750, así que el cambio de WhatsApp del punto 31
+  no requiere reapuntar nada. Deja de ser un riesgo abierto.
+
 ## Pendientes de verificar
 
 - **Destacados de la home** — decisión de producto pendiente (ver punto 9).

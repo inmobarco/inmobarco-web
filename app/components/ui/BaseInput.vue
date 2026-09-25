@@ -7,6 +7,8 @@ const props = withDefaults(defineProps<{
   required?: boolean
   placeholder?: string
   autocomplete?: string
+  /** Teclado que se abre en móvil: `numeric` para importes, `tel` para teléfonos. */
+  inputmode?: 'text' | 'numeric' | 'tel' | 'email'
   /** Campo trampa para bots: se oculta y su contenido descarta el envío (§8.4). */
   honeypot?: boolean
 }>(), {
@@ -15,6 +17,7 @@ const props = withDefaults(defineProps<{
   error: undefined,
   placeholder: undefined,
   autocomplete: undefined,
+  inputmode: undefined,
 })
 
 const model = defineModel<string>({ default: '' })
@@ -39,6 +42,7 @@ const describedBy = computed(() => [errorId.value, hintId.value].filter(Boolean)
       :required="required && !honeypot"
       :placeholder="placeholder"
       :autocomplete="honeypot ? 'off' : autocomplete"
+      :inputmode="inputmode"
       :tabindex="honeypot ? -1 : undefined"
       :aria-invalid="error ? true : undefined"
       :aria-describedby="describedBy"

@@ -129,6 +129,11 @@ export default defineNuxtConfig({
         rateLimiter: { tokensPerInterval: 5, interval: 600_000 },
       },
     },
+    '/api/consign': {
+      security: {
+        rateLimiter: { tokensPerInterval: 5, interval: 600_000 },
+      },
+    },
 
     // Páginas de contenido: se generan en el build y se sirven como estáticas (§6.3).
     '/nosotros': { prerender: true },
