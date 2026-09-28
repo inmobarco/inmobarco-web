@@ -2,6 +2,11 @@ import tailwindcss from '@tailwindcss/vite'
 import { LEGAL_DOCUMENTS } from './shared/data/legal-documents'
 import { CONTENT_PAGES, FAQ } from './shared/data/pages'
 
+const PRODUCTION_SITE_URL = 'https://inmobarco.com'
+
+const siteUrl = process.env.NUXT_PUBLIC_SITE_URL || PRODUCTION_SITE_URL
+const isProductionSite = siteUrl.replace(/\/+$/, '') === PRODUCTION_SITE_URL
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
@@ -70,10 +75,20 @@ export default defineNuxtConfig({
   },
 
   site: {
-    url: process.env.NUXT_PUBLIC_SITE_URL || 'https://inmobarco.com',
+    url: siteUrl,
     name: 'Inmobarco Inmobiliaria',
     description: 'Arrendamiento y administración de inmuebles en el Valle de Aburrá.',
     defaultLocale: 'es-CO',
+    /**
+     * Solo el dominio de producción se indexa. Cualquier otro —el preview del
+     * VPS, un staging -- sale con `Disallow: /` en robots.txt y cabecera
+     * `X-Robots-Tag: noindex`.
+     *
+     * Se deduce de la URL en vez de ser una bandera aparte porque una bandera se
+     * olvida: un preview indexado se come su propio contenido duplicado contra
+     * inmobarco.com y el daño tarda semanas en revertirse.
+     */
+    indexable: isProductionSite,
   },
 
   // Wasi sirve imágenes desde dos hosts distintos: `url`/`url_big` en image.wasi.co

@@ -525,6 +525,46 @@ quien lea el correo no tendría por qué traducir `la-estrella` de cabeza.
 - **Barquito:** funciona también en el 304 525 8750, así que el cambio de WhatsApp del punto 31
   no requiere reapuntar nada. Deja de ser un riesgo abierto.
 
+## 2026-09-28 — Preparación del despliegue
+
+### 45. Solo el dominio de producción se indexa
+
+`site.indexable` se deduce de `NUXT_PUBLIC_SITE_URL`: si no es exactamente
+`https://inmobarco.com`, el sitio sirve `Disallow: /` y `X-Robots-Tag: noindex, nofollow`.
+Verificado con las dos URL.
+
+Se dedujo de la URL en vez de ponerlo como bandera aparte porque una bandera se olvida, y un
+preview indexado compite en Google contra el sitio real con el mismo contenido. Revertir eso
+cuesta semanas.
+
+### 46. Dos fallos que habrían tumbado el build en el VPS
+
+El `Dockerfile` del manual estaba incompleto para este proyecto:
+
+- **Corepack pide confirmación por consola** para descargar la versión de pnpm del campo
+  `packageManager`. En Docker no hay nadie que responda y el build se queda colgado. Se añadió
+  `COREPACK_ENABLE_DOWNLOAD_PROMPT=0`.
+- **`--ignore-scripts=false` sobraba y confundía.** Quien autoriza los scripts de instalación en
+  pnpm 12 es el `allowBuilds` de `pnpm-workspace.yaml`, y por eso ese archivo **tiene que
+  copiarse a la imagen** junto al `package.json` y el lockfile. Sin él, la instalación se
+  detiene con `ERR_PNPM_IGNORED_BUILDS`.
+
+Además, la imagen final corre como `USER node` y el healthcheck espera 15 s antes del primer
+intento.
+
+### 47. El build no necesita credenciales
+
+Comprobado apartando el `.env`: `pnpm build` termina correctamente y genera las once páginas
+estáticas sin llamar a Wasi ni una vez. Importa porque `.dockerignore` excluye el `.env`, así
+que dentro de la imagen no existe: si el build dependiera de las credenciales, fallaría en el
+VPS y funcionaría en local.
+
+El lockfile, generado en Windows, incluye los binarios de todas las plataformas —entre ellos
+`@img/sharp-linuxmusl-x64` y `@tailwindcss/oxide-linux-x64-musl`, que son los que usa Alpine—,
+así que `--frozen-lockfile` resuelve bien en Linux.
+
+Los pasos completos están en `docs/DEPLOY.md`.
+
 ## Pendientes de verificar
 
 - **Destacados de la home** — decisión de producto pendiente (ver punto 9).
