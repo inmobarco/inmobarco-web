@@ -61,23 +61,35 @@ NUXT_PUBLIC_TURNSTILE_SITE_KEY=...
 NUXT_PUBLIC_GTAG_ID=...
 ```
 
-### `NUXT_PUBLIC_SITE_URL` decide si el sitio se indexa
+### Indexación: apagada salvo que se pida
 
-Solo `https://inmobarco.com` se entrega a los buscadores. Cualquier otro valor
-—el preview, un staging— sirve `Disallow: /` en `robots.txt` y la cabecera
-`X-Robots-Tag: noindex, nofollow`.
+El sitio **no se entrega a los buscadores** a menos que exista
+`NUXT_SITE_INDEXABLE=true` en el entorno. Sin esa variable sirve `Disallow: /` en
+`robots.txt` y la cabecera `X-Robots-Tag: noindex, nofollow`.
 
-Se deduce de la URL y no de una bandera aparte porque una bandera se olvida, y
-un preview indexado compite en Google contra el sitio real con el mismo
-contenido. Eso tarda semanas en revertirse.
+Es decir: **el preview no necesita configuración**, y es **producción** la que
+tiene que activarla:
 
-**Conviene comprobarlo en cuanto el preview esté arriba:**
-
-```bash
-curl -s https://preview.inmobarco.com/robots.txt
+```
+NUXT_SITE_INDEXABLE=true      # solo en inmobarco.com
 ```
 
-Debe decir `Disallow: /`.
+El defecto está puesto en ese sentido a conciencia. Olvidarla en producción deja
+el sitio sin indexar: se nota y se arregla en un minuto. Al revés —un preview
+compitiendo en Google contra el sitio real con el mismo contenido— tarda semanas
+en revertirse.
+
+Se lee al arrancar el contenedor, así que cambiarla **no exige reconstruir**:
+basta con guardarla y reiniciar el servicio.
+
+**Compruébalo siempre después de desplegar:**
+
+```bash
+curl -s https://TU-DOMINIO/robots.txt
+```
+
+En el preview debe decir `Disallow: /`. En producción, `Disallow:` a secas y la
+línea del `Sitemap:`.
 
 ## Pasos en Easypanel
 

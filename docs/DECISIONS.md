@@ -527,15 +527,28 @@ quien lea el correo no tendría por qué traducir `la-estrella` de cabeza.
 
 ## 2026-09-28 — Preparación del despliegue
 
-### 45. Solo el dominio de producción se indexa
+### 45. Indexación apagada por defecto (corregido el 28-09-2026)
 
-`site.indexable` se deduce de `NUXT_PUBLIC_SITE_URL`: si no es exactamente
-`https://inmobarco.com`, el sitio sirve `Disallow: /` y `X-Robots-Tag: noindex, nofollow`.
-Verificado con las dos URL.
+**Primer intento, equivocado:** deducir `site.indexable` de `NUXT_PUBLIC_SITE_URL`. En local
+funcionaba con las dos URL, así que pasó la verificación. En el VPS falló.
 
-Se dedujo de la URL en vez de ponerlo como bandera aparte porque una bandera se olvida, y un
-preview indexado compite en Google contra el sitio real con el mismo contenido. Revertir eso
-cuesta semanas.
+La causa: **Easypanel inyecta las variables al arrancar el contenedor, no al construir la
+imagen**. Durante el build `NUXT_PUBLIC_SITE_URL` no existe, la comprobación cayó del lado de
+producción y `indexable: true` quedó grabado en el bundle. El preview salió con
+`X-Robots-Tag: index, follow` y `robots.txt` abierto — exactamente el daño que la regla
+pretendía evitar.
+
+Lección que conviene no olvidar: **una comprobación que se evalúa en tiempo de build no puede
+depender de configuración que solo existe en tiempo de ejecución.** Probarla en local, donde el
+`.env` está presente durante el build, no la valida.
+
+**Como quedó:** `indexable: false` fijo, y producción tiene que poner `NUXT_SITE_INDEXABLE=true`
+en el entorno. Es variable de ejecución, así que cambiarla no exige reconstruir. El defecto está
+en ese sentido a conciencia: olvidarla en producción deja el sitio sin indexar, que se nota y se
+arregla en un minuto; al revés tarda semanas.
+
+Verificado en las dos direcciones sobre el build de producción: sin variable, `Disallow: /`; con
+`NUXT_SITE_INDEXABLE=true`, indexable y con la línea del sitemap.
 
 ### 46. Dos fallos que habrían tumbado el build en el VPS
 

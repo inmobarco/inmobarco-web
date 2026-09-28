@@ -5,7 +5,6 @@ import { CONTENT_PAGES, FAQ } from './shared/data/pages'
 const PRODUCTION_SITE_URL = 'https://inmobarco.com'
 
 const siteUrl = process.env.NUXT_PUBLIC_SITE_URL || PRODUCTION_SITE_URL
-const isProductionSite = siteUrl.replace(/\/+$/, '') === PRODUCTION_SITE_URL
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -80,15 +79,22 @@ export default defineNuxtConfig({
     description: 'Arrendamiento y administración de inmuebles en el Valle de Aburrá.',
     defaultLocale: 'es-CO',
     /**
-     * Solo el dominio de producción se indexa. Cualquier otro —el preview del
-     * VPS, un staging -- sale con `Disallow: /` en robots.txt y cabecera
-     * `X-Robots-Tag: noindex`.
+     * **No se indexa salvo que alguien lo pida explícitamente.**
      *
-     * Se deduce de la URL en vez de ser una bandera aparte porque una bandera se
-     * olvida: un preview indexado se come su propio contenido duplicado contra
-     * inmobarco.com y el daño tarda semanas en revertirse.
+     * Primero se dedujo de la URL, y salió mal: Easypanel inyecta las variables
+     * al arrancar el contenedor, no al construir la imagen, así que durante el
+     * build `NUXT_PUBLIC_SITE_URL` no existe y la comprobación caía siempre del
+     * lado de producción. El preview salió indexable.
+     *
+     * Por eso el valor por defecto es `false` y en producción hay que poner
+     * `NUXT_SITE_INDEXABLE=true` en el entorno. Olvidarlo deja el sitio sin
+     * indexar, que se nota y se arregla en un minuto; lo contrario —un preview
+     * compitiendo en Google con el sitio real por el mismo contenido— tarda
+     * semanas en revertirse.
+     *
+     * Se lee en tiempo de ejecución: cambiarla no exige reconstruir la imagen.
      */
-    indexable: isProductionSite,
+    indexable: false,
   },
 
   // Wasi sirve imágenes desde dos hosts distintos: `url`/`url_big` en image.wasi.co
