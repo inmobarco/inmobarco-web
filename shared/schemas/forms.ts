@@ -234,6 +234,13 @@ const documentNumber = z.string()
   .refine(value => /^[\d.\-\s]+$/.test(value), 'El documento solo lleva números')
 
 export const maintenanceSchema = z.object({
+  /**
+   * Agrupa los adjuntos de un mismo reporte. Lo genera el navegador porque los
+   * archivos se suben antes de enviar el formulario, cuando todavía no existe
+   * radicado: las evidencias caen en una carpeta con este identificador y n8n
+   * las reubica bajo el radicado que asigne.
+   */
+  submissionId: z.uuid('Identificador de envío inválido'),
   name,
   documentNumber,
   email,
@@ -295,6 +302,7 @@ export interface MaintenanceFormDraft extends Omit<MaintenanceForm, 'consent' | 
 
 export function emptyMaintenanceForm(): MaintenanceFormDraft {
   return {
+    submissionId: crypto.randomUUID(),
     name: '',
     documentNumber: '',
     email: '',

@@ -13,6 +13,8 @@ export interface UploadUrlResponse {
 }
 
 const requestSchema = z.object({
+  /** Carpeta en la que se agrupan los adjuntos de un mismo reporte. */
+  submissionId: z.uuid(),
   contentType: z.string().refine(value => ALL_UPLOAD_TYPES.includes(value), 'Formato no admitido'),
   size: z.number().int().positive(),
   captchaToken: z.string().optional(),
@@ -53,7 +55,7 @@ export default defineEventHandler(async (event): Promise<UploadUrlResponse> => {
     throw createError({ statusCode: 413, statusMessage: 'El archivo supera el tamaño permitido' })
   }
 
-  const key = buildObjectKey(body.contentType)
+  const key = buildObjectKey(body.submissionId, body.contentType)
   const url = await presignUpload(key, body.contentType, body.size)
 
   return { key, url, expiresIn: UPLOAD_EXPIRES_IN_SECONDS }

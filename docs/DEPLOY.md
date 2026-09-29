@@ -68,53 +68,104 @@ servidor**: el navegador los sube directo al bucket con una URL que firma Nitro 
 cinco minutos.
 
 ```
-NUXT_R2_ENDPOINT=https://<account-id>.r2.cloudflarestorage.com
+NUXT_R2_ENDPOINT=https://<id-de-cuenta>.r2.cloudflarestorage.com
 NUXT_R2_BUCKET=...
 NUXT_R2_ACCESS_KEY_ID=...
 NUXT_R2_SECRET_ACCESS_KEY=...
+NUXT_R2_REGION=auto
 ```
 
-Mientras falte cualquiera de las cuatro, el formulario funciona igual pero sin adjuntos y lo
+De los tres valores que muestra Cloudflare al crear el token de API, aquí se usan **Access Key
+ID** y **Secret Access Key**. El «Token value» no: ese sirve para la API de Cloudflare, no para
+el protocolo S3.
+
+Si el bucket se creó con jurisdicción, el endpoint lleva la jurisdicción en medio
+(`https://<id>.eu.r2.cloudflarestorage.com`) y entonces **`NUXT_R2_REGION` tiene que ser esa
+jurisdicción** (`eu`) y no `auto`. Si no coincide, R2 responde 403 sin decir por qué.
+
+Mientras falte cualquiera de las variables, el formulario funciona igual pero sin adjuntos y lo
 dice en pantalla. No hay que desactivar nada.
 
-En el bucket hacen falta además dos cosas que no se configuran desde aquí:
+#### Estructura del bucket
 
-- **CORS**, para que el navegador pueda hacer `PUT`. Método `PUT`, origen el dominio del sitio,
-  y `content-type` entre las cabeceras permitidas. Sin esto la subida falla en el navegador
-  aunque la URL esté bien firmada.
-- **Una regla de ciclo de vida** sobre el prefijo `evidencias/`, que borre los objetos al
-  cumplir el plazo de conservación acordado. Es lo que hace cierta la promesa de la política de
-  tratamiento; sin ella los archivos viven para siempre.
+El sitio **no puede archivar por radicado**: los archivos se suben mientras el usuario llena el
+formulario, y el radicado lo asigna n8n al recibir el envío, que ocurre después. Por eso hay dos
+zonas y un traslado en medio.
 
-### Indexación: apagada salvo que se pida
-
-El sitio **no se entrega a los buscadores** a menos que exista
-`NUXT_SITE_INDEXABLE=true` en el entorno. Sin esa variable sirve `Disallow: /` en
-`robots.txt` y la cabecera `X-Robots-Tag: noindex, nofollow`.
-
-Es decir: **el preview no necesita configuración**, y es **producción** la que
-tiene que activarla:
+**Lo que escribe el sitio** —lo único que escribe— es una bandeja de entrada agrupada por envío:
 
 ```
-NUXT_SITE_INDEXABLE=true      # solo en inmobarco.com
+entrantes/{id-envio}/{uuid}.jpg
 ```
 
-El defecto está puesto en ese sentido a conciencia. Olvidarla en producción deja
-el sitio sin indexar: se nota y se arregla en un minuto. Al revés —un preview
-compitiendo en Google contra el sitio real con el mismo contenido— tarda semanas
-en revertirse.
+El `id-envio` es un UUID que genera el navegador al abrir el formulario y que viaja también en
+el JSON del envío, en el campo `attachmentPrefix`. Con él, n8n sabe exactamente qué carpeta
+recoger.
 
-Se lee al arrancar el contenedor, así que cambiarla **no exige reconstruir**:
-basta con guardarla y reiniciar el servicio.
+**Lo que arma n8n** al asignar el radicado, copiando desde la bandeja y borrando el original:
 
-**Compruébalo siempre después de desplegar:**
-
-```bash
-curl -s https://TU-DOMINIO/robots.txt
+```
+mantenimientos/{año}/{mes}/{radicado}/antes/{uuid}.jpg       # lo que subió el cliente
+mantenimientos/{año}/{mes}/{radicado}/despues/{uuid}.jpg     # fotos del técnico al cerrar
+mantenimientos/{año}/{mes}/{radicado}/soportes/factura.pdf   # facturas y remisiones
 ```
 
-En el preview debe decir `Disallow: /`. En producción, `Disallow:` a secas y la
-línea del `Sitemap:`.
+Las dos últimas carpetas no las toca el sitio nunca: son de la operación, y quien las escriba
+—n8n o quien atienda la orden— usa sus propias credenciales.
+
+#### Reglas de ciclo de vida
+
+Se crean en **R2 > el bucket > Settings > Object lifecycle rules > Add rule**. Cada regla pide
+un nombre, un prefijo y una acción; aquí la acción siempre es *Delete uploaded objects after*.
+
+Hacen falta **dos, y con prefijos que no se solapen**. Es la razón por la que `entrantes/`
+cuelga de la raíz y no de `mantenimientos/`: con prefijos anidados, la regla corta se aplicaría
+también a lo archivado y borraría la evidencia de todos los radicados sin que nadie se entere.
+
+| Nombre | Prefijo | Borrar a los | Por qué |
+|---|---|---|---|
+| `archivo-mantenimiento` | `mantenimientos/` | el plazo acordado | Es lo que hace cierta la promesa de la política de tratamiento. Sin esta regla los archivos viven para siempre. |
+| `bandeja-entrantes` | `entrantes/` | 1 día | Recoge lo que alguien subió y luego abandonó el formulario. |
+
+**El orden en que se activan importa, y mucho.** Mientras n8n no copie de `entrantes/` a
+`mantenimientos/`, la bandeja es el único sitio donde existen las evidencias: activar ahí una
+regla de un día **borra reportes de verdad al día siguiente**.
+
+Así que: la regla de `mantenimientos/` se puede crear desde ya, porque no hay nada que pueda
+romper. La de `entrantes/` **se crea después de que el traslado en n8n funcione**. Si se quiere
+tener algo entretanto, que sea de 30 días y no de uno.
+
+#### CORS
+
+Hay que configurarlo en el bucket o el navegador no podrá hacer `PUT`, por bien firmada que esté
+la URL.
+
+```json
+[
+  {
+    "AllowedOrigins": [
+      "https://automa-inmobarco-inmobarco-web.druysh.easypanel.host",
+      "https://inmobarco.com",
+      "http://localhost:3000"
+    ],
+    "AllowedMethods": ["PUT"],
+    "AllowedHeaders": ["content-type"],
+    "MaxAgeSeconds": 3600
+  }
+]
+```
+
+**Los orígenes van sin barra final.** El navegador manda la cabecera `Origin` como
+`https://servidor.com`, nunca `https://servidor.com/`, y R2 compara la cadena tal cual: con la
+barra de más la regla no coincide nunca y la subida falla con un error de CORS que no dice qué
+pasó.
+
+`http://localhost:3000` está para poder probar con `pnpm dev`. Ojo con el puerto: si el 3000 está
+ocupado, Nuxt arranca en el 3001 y ese es otro origen distinto para el navegador. Hay que mirar el
+que imprime `pnpm dev` al arrancar y que sea el que está en la lista.
+
+Localhost en la lista no abre nada: para escribir en el bucket sigue haciendo falta una URL
+firmada por el servidor.
 
 ## Pasos en Easypanel
 

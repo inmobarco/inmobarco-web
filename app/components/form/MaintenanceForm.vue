@@ -138,7 +138,15 @@ function addFiles(files: File[]) {
       continue
     }
 
-    const entry: Evidence = {
+    /**
+     * `reactive` y no un objeto normal: `process()` muta esta entrada desde una
+     * promesa —progreso, estado, clave— y `push` guarda el objeto **en bruto**.
+     * Mutar el objeto en bruto cambia el dato pero no dispara nada, así que la
+     * tarjeta se quedaba clavada en «Preparando…» con el archivo ya subido, y
+     * `uploadsPending` nunca volvía a calcularse: el botón de enviar se quedaba
+     * bloqueado para siempre.
+     */
+    const entry: Evidence = reactive({
       id: Date.now() + '-' + Math.random().toString(36).slice(2, 8),
       name: file.name,
       kind,
@@ -149,7 +157,7 @@ function addFiles(files: File[]) {
       progress: 0,
       error: '',
       key: null,
-    }
+    })
 
     evidence.value.push(entry)
     void process(entry, file)
@@ -164,7 +172,11 @@ async function process(entry: Evidence, file: File) {
 
     const { key, url } = await $fetch<UploadUrlResponse>('/api/maintenance/upload-url', {
       method: 'POST',
-      body: { contentType: prepared.contentType, size: prepared.blob.size },
+      body: {
+        submissionId: form.value.submissionId,
+        contentType: prepared.contentType,
+        size: prepared.blob.size,
+      },
     })
 
     entry.status = 'uploading'

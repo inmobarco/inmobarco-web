@@ -618,9 +618,20 @@ foto servía para meter gigabytes en el bucket. `content-type` y `content-length
 de cabeceras no firmables de aws4fetch y hay que pedirlas con `allHeaders: true`. Ahora la firma
 sale con `content-length;content-type;host`.
 
-**Se degrada solo.** Mientras falte cualquiera de las cuatro variables de R2, el endpoint de firma
-responde 503, el formulario lo detecta y sigue adelante sin adjuntos en vez de dejar al usuario
-atascado en un paso que no puede completar.
+**El sitio no archiva por radicado, y no puede.** Los archivos se suben mientras el usuario llena
+el formulario; el radicado lo asigna n8n al recibir el envío, después. Así que el sitio escribe en
+una bandeja de entrada agrupada por envío —`entrantes/{id-envio}/{uuid}.ext`, con un UUID que
+genera el navegador— y es n8n quien copia cada objeto a `mantenimientos/{año}/{mes}/{radicado}/`.
+El envío lleva el prefijo de la carpeta para que n8n sepa qué recoger.
+
+`entrantes/` cuelga de la raíz y **no** de `mantenimientos/` por una razón concreta: las dos zonas
+necesitan reglas de ciclo de vida opuestas —la bandeja se vacía en un día, el archivo vive años— y
+en R2 los prefijos anidados hacen que las reglas se solapen. Con `mantenimientos/entrantes/`, la
+regla corta habría acabado borrando la evidencia de todos los radicados sin que nadie se enterara.
+
+**Se degrada solo.** Mientras falten las variables de R2, el endpoint de firma responde 503, el
+formulario lo detecta y sigue adelante sin adjuntos en vez de dejar al usuario atascado en un paso
+que no puede completar.
 
 **Retención — pendiente de Inmobarco.** Lo recomendado: dos años para las fotos y el video, cinco
 o más para el registro del radicado, que es texto y es lo que prueba que se atendió. Conservar
@@ -650,8 +661,9 @@ dominio del sitio.
   resuelve con degradados CSS y texto.
 - **§15.4, §15.5** — pendientes de Inmobarco (matrículas de arrendador, cifras reales, URL de
   Palomma en producción, tonos 700–950 contra el manual de marca).
-- **Bucket de R2** — falta crearlo, configurar su CORS para admitir `PUT` desde el dominio del
-  sitio, y fijar la regla de ciclo de vida sobre `evidencias/` con el plazo que decida Inmobarco.
+- **Bucket de R2** — creado (29-09-2026). Falta configurar su CORS para admitir `PUT` desde el
+  dominio del sitio, las dos reglas de ciclo de vida (`entrantes/` a un día, `mantenimientos/` al
+  plazo que decida Inmobarco) y el paso de n8n que copia de la bandeja al archivo por radicado.
 - **Plazos de atención de mantenimiento** — la página `/mantenimiento` sigue en `pending` porque
   no existen todavía: tiempo comprometido por tipo de falla, qué se considera urgencia y cómo se
   reparte el costo entre propietario y arrendatario.

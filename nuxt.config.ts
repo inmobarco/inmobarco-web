@@ -69,6 +69,8 @@ export default defineNuxtConfig({
       bucket: '',
       accessKeyId: '',
       secretAccessKey: '',
+      /** `auto` en un bucket normal; la jurisdicción (`eu`) si el endpoint la lleva. */
+      region: 'auto',
     },
     public: {
       siteUrl: '',

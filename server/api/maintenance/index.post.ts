@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { findMaintenanceCategory, maintenanceSchema, MAINTENANCE_CLIENT_TYPES, MAINTENANCE_DAYS, MAINTENANCE_TIME_SLOTS } from '#shared/schemas/forms'
 import { formsArePublishable } from '#shared/data/legal-documents'
 import { sendToN8n, verifyTurnstile } from '../../utils/n8n'
+import { INBOX_PREFIX } from '../../utils/r2'
 
 export interface MaintenanceResponse {
   ok: true
@@ -50,6 +51,7 @@ export default defineEventHandler(async (event): Promise<MaintenanceResponse> =>
    * firma la URL de lectura cuando arma el correo.
    */
   const response = await sendToN8n('maintenance', {
+    submissionId: body.submissionId,
     name: body.name,
     documentNumber: body.documentNumber,
     email: body.email,
@@ -68,6 +70,8 @@ export default defineEventHandler(async (event): Promise<MaintenanceResponse> =>
 
     attachments: body.attachments,
     attachmentCount: body.attachments.length,
+    /** Carpeta de la bandeja de entrada en R2 donde n8n encuentra los adjuntos. */
+    attachmentPrefix: body.attachments.length > 0 ? `${INBOX_PREFIX}/${body.submissionId}/` : null,
 
     availableDays: body.availableDays,
     availableDaysLabels: body.availableDays.map(day => label(MAINTENANCE_DAYS, day)),
