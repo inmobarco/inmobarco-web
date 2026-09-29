@@ -24,11 +24,15 @@ export const OPENING_HOURS = {
  * - `commercial` es el del negocio: arriendo, venta, visitas, consignación. Es el
  *   que ve el visitante en la cabecera, el pie, las fichas y los CTA, porque es
  *   para lo que existe esta página.
- * - `legal` es el administrativo: PQRS, habeas data, ejercicio de derechos sobre
- *   datos personales. Solo aparece en las páginas legales y en los trámites.
+ * - `legal` es el administrativo: peticiones, quejas y reclamos, habeas data y
+ *   ejercicio de derechos sobre datos personales. Solo aparece en las páginas
+ *   legales y en los trámites. **Es el canal de PQRS de la compañía**: la
+ *   política de tratamiento lo publica y no depende de ninguna página de
+ *   formulario.
  *
  * El correo de mantenimiento se retiró de la interfaz por decisión de Inmobarco
- * (23-09-2026): las novedades entran por PQRS, que sí deja constancia.
+ * (23-09-2026): las novedades entran por `/mantenimiento`, que deja constancia
+ * con un número de radicado.
  */
 export const CONTACT = {
   commercial: {

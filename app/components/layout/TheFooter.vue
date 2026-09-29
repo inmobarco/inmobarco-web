@@ -18,7 +18,7 @@ const companyLinks = [
   { label: 'Propietarios', to: '/propietarios' },
   { label: 'Aliados', to: '/aliados' },
   { label: 'Contacto', to: '/contacto' },
-  { label: 'PQRS', to: '/pqrs' },
+  { label: 'Mantenimiento', to: '/mantenimiento' },
   { label: 'Preguntas frecuentes', to: '/preguntas-frecuentes' },
 ]
 </script>

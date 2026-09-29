@@ -56,6 +56,20 @@ export default defineNuxtConfig({
     },
     n8nWebhookUrl: '',
     turnstileSecretKey: '',
+    /**
+     * Cloudflare R2: guarda las evidencias de los reportes de mantenimiento.
+     *
+     * Privado, como las de Wasi. El navegador nunca ve estas llaves: sube los
+     * archivos con una URL que firma el servidor y caduca en cinco minutos.
+     * Mientras falte cualquiera de las cuatro, `/api/maintenance/upload-url`
+     * responde 503 y el formulario sigue funcionando sin adjuntos.
+     */
+    r2: {
+      endpoint: '',
+      bucket: '',
+      accessKeyId: '',
+      secretAccessKey: '',
+    },
     public: {
       siteUrl: '',
       turnstileSiteKey: '',
@@ -155,12 +169,28 @@ export default defineNuxtConfig({
         rateLimiter: { tokensPerInterval: 5, interval: 600_000 },
       },
     },
+    '/api/maintenance': {
+      security: {
+        rateLimiter: { tokensPerInterval: 5, interval: 600_000 },
+      },
+    },
+    /**
+     * Más holgado que los demás, y con razón: un solo reporte puede pedir hasta
+     * seis URL firmadas (cinco fotos y un video). Treinta son cinco reportes por
+     * IP cada diez minutos, que para una persona sobra y para quien quiera usar
+     * el bucket como almacenamiento gratis no da.
+     */
+    '/api/maintenance/upload-url': {
+      security: {
+        rateLimiter: { tokensPerInterval: 30, interval: 600_000 },
+      },
+    },
 
     // Páginas de contenido: se generan en el build y se sirven como estáticas (§6.3).
     '/nosotros': { prerender: true },
     '/aliados': { prerender: true },
     '/contacto': { prerender: true },
-    '/pqrs': { prerender: true },
+    '/mantenimiento': { prerender: true },
     '/preguntas-frecuentes': { prerender: true },
     '/propietarios': { prerender: true },
     '/legal/**': { prerender: true },

@@ -126,19 +126,31 @@ export const CONTACTO: ContentPage = {
   ],
 }
 
-export const PQRS_PAGE: ContentPage = {
-  title: 'Peticiones, quejas, reclamos y sugerencias',
-  description: 'Radica una PQRS ante Inmobarco Inmobiliaria y conoce los plazos de respuesta.',
-  intro: 'Toda petición, queja, reclamo o sugerencia queda radicada y con un responsable asignado.',
+/**
+ * Sustituye a la antigua página de PQRS (ver `docs/DECISIONS.md`, punto 48).
+ *
+ * Esto es un trámite operativo de quien ya tiene contrato, no el canal legal de
+ * peticiones, quejas y reclamos: ese sigue siendo el que publica la política de
+ * tratamiento —correo, dirección y teléfono del área administrativa— y no
+ * depende de esta página.
+ */
+export const MANTENIMIENTO_PAGE: ContentPage = {
+  title: 'Reportar una falla de mantenimiento',
+  description: 'Reporta una falla en el inmueble que arriendas o administras con Inmobarco y recibe el número de radicado.',
+  intro: 'Cuéntanos qué está fallando, adjunta una foto o un video y coordinamos la visita del técnico.',
   pending: true,
   sections: [
     {
-      heading: 'Plazos de respuesta',
-      body: ['Pendiente: plazo comprometido de respuesta por tipo de solicitud, y el marco legal que aplica.'],
+      heading: 'Plazos de atención',
+      body: ['Pendiente: tiempo comprometido de respuesta y de visita por tipo de falla, y qué se considera una urgencia.'],
+    },
+    {
+      heading: 'Qué asume el propietario y qué el arrendatario',
+      body: ['Pendiente: criterio con el que se reparte el costo de la reparación según su causa.'],
     },
     {
       heading: 'Cómo hacemos seguimiento',
-      body: ['Pendiente: cómo se le informa al usuario el número de radicado y por dónde consulta el estado.'],
+      body: ['Pendiente: por dónde se consulta el estado de un radicado y cómo se avisa cuando se cierra.'],
     },
   ],
 }
@@ -153,7 +165,7 @@ export const CONTENT_PAGES: { path: string, content: ContentPage }[] = [
   { path: '/aliados', content: ALIADOS },
   { path: '/propietarios', content: PROPIETARIOS },
   { path: '/contacto', content: CONTACTO },
-  { path: '/pqrs', content: PQRS_PAGE },
+  { path: '/mantenimiento', content: MANTENIMIENTO_PAGE },
 ]
 
 export interface FaqItem {
@@ -175,7 +187,7 @@ export const FAQ: { page: ContentPage, items: FaqItem[] } = {
     { question: '¿Cuánto cuesta el estudio del arrendatario y quién lo paga?', answer: 'Pendiente: valor del estudio y quién lo asume.', pending: true },
     { question: '¿Cuánto tarda la aprobación?', answer: 'Pendiente: tiempo habitual entre la solicitud y la aprobación.', pending: true },
     { question: '¿La administración está incluida en el canon?', answer: 'Pendiente: regla general sobre la cuota de administración y cómo se informa en cada inmueble.', pending: true },
-    { question: '¿Cómo reporto un daño en el inmueble?', answer: 'Pendiente: canal de reporte de mantenimiento y tiempos de atención.', pending: true },
+    { question: '¿Cómo reporto un daño en el inmueble?', answer: 'Pendiente: confirmar que el formulario de mantenimiento es el canal único y con qué tiempos de atención.', pending: true },
     { question: '¿Dónde pago el arriendo?', answer: 'Pendiente: confirmar que Palomma es el canal único y si existen alternativas.', pending: true },
     { question: '¿Qué comisión cobran por administrar mi inmueble?', answer: 'Pendiente: porcentaje de comisión y qué cubre.', pending: true },
   ],

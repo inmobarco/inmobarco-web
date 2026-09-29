@@ -51,7 +51,7 @@ Componente → /api/* (Nitro) → server/utils/wasi.ts (defineCachedFunction)
 
 `routeRules`: prerender en páginas estáticas y legales, `swr: 900` en listados, `swr: 3600` en fichas. Se usa SWR y no ISR por ser self-host.
 
-**Formularios.** `Cliente (zod) → POST /api/{contact|pqrs|consign} → zod en servidor → webhook n8n`. El sitio no envía correos ni conoce destinatarios; n8n enruta. Los esquemas zod son compartidos en `shared/schemas/forms.ts`. Cada envío lleva evidencia de consentimiento (Ley 1581 de 2012): `policyVersion`, `acceptedAt`, IP y user-agent. Antispam: honeypot + Turnstile + rate limiting de `nuxt-security`.
+**Formularios.** `Cliente (zod) → POST /api/{contact|consign|maintenance} → zod en servidor → webhook n8n`. El sitio no envía correos ni conoce destinatarios; n8n enruta. Los esquemas zod son compartidos en `shared/schemas/forms.ts`. Cada envío lleva evidencia de consentimiento (Ley 1581 de 2012): `policyVersion`, `acceptedAt`, IP y user-agent. Antispam: honeypot + Turnstile + rate limiting de `nuxt-security`.
 
 **Enlaces externos** (Palomma, área de clientes, WhatsApp) centralizados en una constante `EXTERNAL_LINKS`, siempre con `target="_blank" rel="noopener noreferrer"` y un `<span class="sr-only">(abre en una nueva pestaña)</span>`.
 
@@ -83,4 +83,4 @@ Definidas en `.env` (ignorado en git) con `.env.example` en el repo:
 
 ## Analítica
 
-GA4 vía `nuxt-gtag` con Consent Mode v2. Nombres de evento exactos: `search_submit`, `property_view`, `whatsapp_click`, `pay_rent_click`, `client_area_click`, `contact_submit`, `pqrs_submit`, `consign_submit`, `filter_apply`.
+GA4 vía `nuxt-gtag` con Consent Mode v2. Nombres de evento exactos: `search_submit`, `property_view`, `whatsapp_click`, `pay_rent_click`, `client_area_click`, `contact_submit`, `maintenance_submit`, `consign_submit`, `filter_apply`.

@@ -13,8 +13,9 @@ import { CONTACT } from '#shared/data/legal'
 
       <!--
         Barra de utilidades: aquí viven los accesos de servicio, no los comerciales.
-        PQRS es de este grupo —es atención al usuario, no conversión—, por eso va
-        junto a pagar arriendo y al área de clientes, y no como CTA de la cabecera.
+        Mantenimiento es de este grupo —es atención a quien ya es cliente, no
+        conversión—, por eso va junto a pagar arriendo y al área de clientes, y no
+        como CTA de la cabecera.
       -->
       <div class="ml-auto flex flex-wrap items-center gap-2">
         <a
@@ -36,10 +37,10 @@ import { CONTACT } from '#shared/data/legal'
           <span class="sr-only">(abre en una nueva pestaña)</span>
         </a>
         <NuxtLink
-          to="/pqrs"
+          to="/mantenimiento"
           class="inline-flex h-[26px] items-center rounded-full border border-white/30 px-3 text-[0.8125rem] font-semibold text-white"
         >
-          PQRS
+          Mantenimiento
         </NuxtLink>
       </div>
     </div>

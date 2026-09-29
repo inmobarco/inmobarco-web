@@ -9,9 +9,9 @@ import { DATA_POLICY_VERSION } from '#shared/data/legal'
  * el enrutamiento —correo, CRM, WhatsApp— vive en n8n.
  */
 
-export type N8nFormKind = 'contact' | 'pqrs' | 'consign'
+export type N8nFormKind = 'contact' | 'consign' | 'maintenance'
 
-/** Cada formulario tiene su webhook: `…/webhook/web-contact`, `web-pqrs`, `web-consign`. */
+/** Cada formulario tiene su webhook: `…/webhook/web-contact`, `web-consign`, `web-maintenance`. */
 function webhookUrl(kind: N8nFormKind): string {
   const base = useRuntimeConfig().n8nWebhookUrl
   if (!base) throw createError({ statusCode: 503, statusMessage: 'n8n no está configurado' })
@@ -37,19 +37,20 @@ function consentEvidence(event: H3Event) {
  * Nota sobre radicados: el sitio **no** los genera. No tiene dónde guardar un
  * consecutivo —el caché de Nitro es memoria del proceso y se reinicia con el
  * contenedor—, y con más de una réplica dos procesos darían el mismo número.
- * Cuando llegue PQRS, el consecutivo lo asigna n8n, que sí tiene estado, y el
- * sitio muestra el que le devuelva.
+ * El consecutivo lo asigna n8n, que sí tiene estado, y el sitio muestra el que
+ * le devuelva. Por eso esta función devuelve la respuesta del webhook en vez de
+ * descartarla.
  */
 
 export async function sendToN8n(
   kind: N8nFormKind,
   payload: Record<string, unknown>,
   event: H3Event,
-): Promise<void> {
+): Promise<unknown> {
   const url = webhookUrl(kind)
 
   try {
-    await $fetch(url, {
+    return await $fetch(url, {
       method: 'POST',
       body: {
         kind,

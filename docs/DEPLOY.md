@@ -61,6 +61,31 @@ NUXT_PUBLIC_TURNSTILE_SITE_KEY=...
 NUXT_PUBLIC_GTAG_ID=...
 ```
 
+### Adjuntos de mantenimiento (Cloudflare R2)
+
+El formulario de `/mantenimiento` admite fotos y video. Los archivos **no pasan por este
+servidor**: el navegador los sube directo al bucket con una URL que firma Nitro y caduca en
+cinco minutos.
+
+```
+NUXT_R2_ENDPOINT=https://<account-id>.r2.cloudflarestorage.com
+NUXT_R2_BUCKET=...
+NUXT_R2_ACCESS_KEY_ID=...
+NUXT_R2_SECRET_ACCESS_KEY=...
+```
+
+Mientras falte cualquiera de las cuatro, el formulario funciona igual pero sin adjuntos y lo
+dice en pantalla. No hay que desactivar nada.
+
+En el bucket hacen falta además dos cosas que no se configuran desde aquí:
+
+- **CORS**, para que el navegador pueda hacer `PUT`. Método `PUT`, origen el dominio del sitio,
+  y `content-type` entre las cabeceras permitidas. Sin esto la subida falla en el navegador
+  aunque la URL esté bien firmada.
+- **Una regla de ciclo de vida** sobre el prefijo `evidencias/`, que borre los objetos al
+  cumplir el plazo de conservación acordado. Es lo que hace cierta la promesa de la política de
+  tratamiento; sin ella los archivos viven para siempre.
+
 ### Indexación: apagada salvo que se pida
 
 El sitio **no se entrega a los buscadores** a menos que exista

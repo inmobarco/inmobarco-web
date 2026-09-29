@@ -578,6 +578,65 @@ así que `--frozen-lockfile` resuelve bien en Linux.
 
 Los pasos completos están en `docs/DEPLOY.md`.
 
+### 48. PQRS se sustituye por el reporte de mantenimiento
+
+Decisión de Inmobarco (29-09-2026): la página de PQRS del §8.3 desaparece y en su lugar queda
+`/mantenimiento`, un asistente por pasos para reportar una falla en el inmueble.
+
+**Lo primero que se comprobó es que esto no deja a la compañía sin canal de PQRS.** El canal legal
+—peticiones, quejas y reclamos sobre datos personales— lo publica la política de tratamiento, ya
+aprobada, con correo, dirección, teléfono y horario del área administrativa. No dependía de la
+página del formulario y sigue en pie.
+
+Y no son la misma cosa. Una PQRS legal dispara los plazos de la Ley 1581 (diez días hábiles para
+consultas, quince para reclamos); un reporte de mantenimiento es un trámite operativo de quien ya
+tiene contrato. Mezclarlos metería una gotera en el conteo de reclamos legales y le pondría encima
+un plazo que no le corresponde.
+
+**Cambios sobre el mockup que entregó Inmobarco:**
+
+- **Se añadieron correo y teléfono.** El mockup no los pedía, y sin ellos no hay por dónde
+  responder el radicado.
+- **La dirección es obligatoria; torre y apartamento, no.** El inventario tiene casas y locales,
+  no solo unidades de conjunto.
+- **Dos autorizaciones separadas**, las dos obligatorias: tratamiento de datos (Ley 1581) e
+  ingreso del técnico a la vivienda. Fundirlas en una casilla no dejaría constancia de ninguna.
+- **La pestaña «Ver radicados» no se implementó.** Listar nombres, cédulas y apartamentos sin
+  autenticación es una fuga de datos; el propio mockup lo advertía. Esa vista vive en n8n o en el
+  CRM.
+
+**Las evidencias van directas del navegador a Cloudflare R2**, no por el sitio ni por n8n. Los
+números que lo deciden: `nuxt-security` corta los cuerpos de petición en 2 MB (8 MB si son
+multipart), un video de celular de un minuto pesa entre 60 y 150 MB, y el servicio corre con una
+sola réplica, así que proxear eso bloquearía la atención del resto de visitas. Nitro solo firma
+una URL; n8n recibe la referencia al objeto.
+
+**Un fallo que se encontró probando.** La primera versión firmaba la URL con `signQuery` a secas y
+salía con `X-Amz-SignedHeaders=host`: ni el tipo ni el tamaño entraban en la firma, de modo que el
+límite de tamaño era una declaración del cliente —es decir, ninguno— y una URL emitida para una
+foto servía para meter gigabytes en el bucket. `content-type` y `content-length` están en la lista
+de cabeceras no firmables de aws4fetch y hay que pedirlas con `allHeaders: true`. Ahora la firma
+sale con `content-length;content-type;host`.
+
+**Se degrada solo.** Mientras falte cualquiera de las cuatro variables de R2, el endpoint de firma
+responde 503, el formulario lo detecta y sigue adelante sin adjuntos en vez de dejar al usuario
+atascado en un paso que no puede completar.
+
+**Retención — pendiente de Inmobarco.** Lo recomendado: dos años para las fotos y el video, cinco
+o más para el registro del radicado, que es texto y es lo que prueba que se atendió. Conservar
+imágenes del interior de la vivienda de alguien cinco años después de que se mudó es difícil de
+sostener ante la SIC, y el costo no es el argumento (cinco años de video rondan los USD 2 al mes).
+Lo que se decida hay que escribirlo en la política **y** hacerlo cumplir con la regla de ciclo de
+vida del bucket sobre el prefijo `evidencias/`.
+
+**Nombre de evento de analítica.** El §14 fija `pqrs_submit`; pasa a ser `maintenance_submit`,
+porque el evento que nombraba ya no puede ocurrir. Se actualizó también en `CLAUDE.md`.
+
+**Qué queda sin comprobar:** la ida y vuelta real contra el webhook `web-maintenance` de n8n (no
+se disparó para no llenar de pruebas la bandeja de Inmobarco), la subida real contra un bucket de
+R2, y el CORS del bucket, que hay que configurar para que el navegador pueda hacer `PUT` desde el
+dominio del sitio.
+
 ## Pendientes de verificar
 
 - **Destacados de la home** — decisión de producto pendiente (ver punto 9).
@@ -591,3 +650,8 @@ Los pasos completos están en `docs/DEPLOY.md`.
   resuelve con degradados CSS y texto.
 - **§15.4, §15.5** — pendientes de Inmobarco (matrículas de arrendador, cifras reales, URL de
   Palomma en producción, tonos 700–950 contra el manual de marca).
+- **Bucket de R2** — falta crearlo, configurar su CORS para admitir `PUT` desde el dominio del
+  sitio, y fijar la regla de ciclo de vida sobre `evidencias/` con el plazo que decida Inmobarco.
+- **Plazos de atención de mantenimiento** — la página `/mantenimiento` sigue en `pending` porque
+  no existen todavía: tiempo comprometido por tipo de falla, qué se considera urgencia y cómo se
+  reparte el costo entre propietario y arrendatario.

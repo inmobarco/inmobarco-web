@@ -107,8 +107,8 @@ onBeforeUnmount(() => {
           <BaseButton :href="EXTERNAL_LINKS.clientArea" variant="ghost" block>
             Área de clientes
           </BaseButton>
-          <BaseButton to="/pqrs" variant="ghost" block>
-            PQRS
+          <BaseButton to="/mantenimiento" variant="ghost" block>
+            Reportar mantenimiento
           </BaseButton>
         </div>
       </div>

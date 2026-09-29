@@ -57,8 +57,8 @@ const propertyCode = computed(() => {
             Novedades de mantenimiento
           </dt>
           <dd class="mt-1">
-            <NuxtLink to="/pqrs" class="font-semibold hover:text-secondary">
-              Radícalas por PQRS
+            <NuxtLink to="/mantenimiento" class="font-semibold hover:text-secondary">
+              Reporta la falla y recibe un radicado
             </NuxtLink>
           </dd>
         </div>
