@@ -105,13 +105,44 @@ recoger.
 **Lo que arma n8n** al asignar el radicado, copiando desde la bandeja y borrando el original:
 
 ```
-mantenimientos/{año}/{mes}/{radicado}/antes/{uuid}.jpg       # lo que subió el cliente
-mantenimientos/{año}/{mes}/{radicado}/despues/{uuid}.jpg     # fotos del técnico al cerrar
-mantenimientos/{año}/{mes}/{radicado}/soportes/factura.pdf   # facturas y remisiones
+mantenimientos/843A/2026-09-PQR-000123/antes/{uuid}.jpg       # lo que subió el cliente
+mantenimientos/843A/2026-09-PQR-000123/despues/{uuid}.jpg     # fotos del técnico al cerrar
+mantenimientos/843A/2026-09-PQR-000123/soportes/factura.pdf   # facturas y remisiones
 ```
+
+Es decir, `mantenimientos/{contrato}/{aaaa-mm}-{radicado}/`. El contrato va primero porque es lo
+que se busca —«qué ha pasado en este inmueble»— y la fecha encabeza la carpeta del radicado para
+que dentro de cada contrato el historial salga ordenado solo, sin más que listar.
+
+El reporte de un propietario puede no traer contrato, porque el inmueble puede estar desocupado
+entre un arrendamiento y el siguiente. Esos van a `mantenimientos/sin-contrato/…`.
 
 Las dos últimas carpetas no las toca el sitio nunca: son de la operación, y quien las escriba
 —n8n o quien atienda la orden— usa sus propias credenciales.
+
+**El traslado no ocurre solo.** Nada en el sitio mueve archivos: si el flujo de n8n no lo hace,
+todo se queda en `entrantes/` para siempre. Lo que tiene que hacer el flujo, en este orden:
+
+1. Recibir el JSON del webhook `web-maintenance`. Trae `attachmentPrefix` —la carpeta exacta que
+   hay que recoger— y `attachments[]`, con la clave completa de cada archivo.
+2. Asignar el radicado.
+3. **Comprobar el `contractNumber` contra la lista real de contratos.** El sitio lo normaliza a
+   mayúsculas y comprueba que no pueda salirse de una ruta, pero **no puede verificar que
+   exista**: un dígito mal tecleado archivaría la evidencia bajo el contrato de otra persona. Si
+   no coincide con ninguno, el reporte va a `mantenimientos/sin-contrato/` y se marca para
+   revisar a mano.
+4. Por cada clave: copiar a `mantenimientos/{contrato}/{aaaa-mm}-{radicado}/antes/{mismo-uuid}.{ext}`
+   y borrar el original. En n8n se hace con el nodo de S3 apuntado al endpoint de R2, o con una
+   petición HTTP que lleve la cabecera `x-amz-copy-source`.
+5. Responder `{"ticket":"..."}`. El sitio muestra en pantalla exactamente lo que reciba ahí.
+
+Conviene que el paso 4 escriba además un `manifiesto.json` en la carpeta del radicado con los
+datos del reporte —quién, qué inmueble, qué falla, cuándo—. Es lo que permite entender una
+carpeta abriéndola, sin tener que cruzarla contra el CRM.
+
+**El contador del radicado tiene que existir antes que el traslado.** Mientras el webhook
+devuelva siempre el mismo número, todos los reportes se archivan en la misma carpeta: no se
+pisan archivos, porque los nombres son UUID, pero el archivo deja de servir para nada.
 
 #### Reglas de ciclo de vida
 

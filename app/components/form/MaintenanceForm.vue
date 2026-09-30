@@ -29,7 +29,7 @@ const STEPS = ['Tus datos', 'La falla', 'Evidencia', 'Disponibilidad']
 
 /** Qué campo se revisa en qué paso. El orden manda el foco al primer error. */
 const STEP_FIELDS: string[][] = [
-  ['name', 'documentNumber', 'email', 'phone', 'clientType', 'propertyAddress', 'tower', 'unit'],
+  ['name', 'documentNumber', 'email', 'phone', 'clientType', 'contractNumber', 'propertyAddress', 'tower', 'unit'],
   ['category', 'subcategory', 'description'],
   ['attachments'],
   ['availableDays', 'timeSlot', 'availabilityNotes', 'entryAuthorization', 'consent'],
@@ -308,6 +308,8 @@ const subcategories = computed(() => {
   return category.subcategories.map(item => ({ value: item, label: item }))
 })
 
+const isTenant = computed(() => form.value.clientType === 'arrendatario')
+
 function chooseCategory(value: string) {
   form.value.category = value
   form.value.subcategory = ''
@@ -384,6 +386,20 @@ function progressLabel(item: Evidence): string {
             name="clientType"
             :options="MAINTENANCE_CLIENT_TYPES"
             :error="errors.clientType"
+          />
+
+          <!--
+            El número de contrato es lo que deja archivar la evidencia por
+            inmueble. Se pide al arrendatario y no al propietario, que puede
+            estar reportando sobre un inmueble desocupado.
+          -->
+          <BaseInput
+            v-model="form.contractNumber"
+            :label="isTenant ? 'Número de contrato' : 'Número de contrato (si el inmueble está arrendado)'"
+            placeholder="843A"
+            :required="isTenant"
+            hint="Aparece en el encabezado de tu contrato de arrendamiento."
+            :error="errors.contractNumber"
           />
 
           <BaseInput

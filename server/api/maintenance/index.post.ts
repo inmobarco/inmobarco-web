@@ -59,6 +59,14 @@ export default defineEventHandler(async (event): Promise<MaintenanceResponse> =>
     clientType: body.clientType,
     clientTypeLabel: label(MAINTENANCE_CLIENT_TYPES, body.clientType),
 
+    /**
+     * Ya normalizado a mayúsculas. **n8n tiene que comprobarlo contra la lista
+     * real de contratos antes de usarlo como carpeta**: el sitio no tiene forma
+     * de verificar que exista, y un dígito mal tecleado archivaría la evidencia
+     * bajo un contrato ajeno.
+     */
+    contractNumber: body.contractNumber || null,
+
     propertyAddress: body.propertyAddress,
     tower: body.tower || null,
     unit: body.unit || null,

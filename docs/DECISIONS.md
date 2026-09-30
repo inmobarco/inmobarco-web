@@ -618,6 +618,24 @@ foto servía para meter gigabytes en el bucket. `content-type` y `content-length
 de cabeceras no firmables de aws4fetch y hay que pedirlas con `allHeaders: true`. Ahora la firma
 sale con `content-length;content-type;host`.
 
+**El archivo se organiza por número de contrato, no por persona.** Se descartó la cédula: es un
+dato personal y la ruta del objeto viaja dentro de cada URL firmada que se le manda a un técnico
+o a un proveedor, que luego se reenvía y se pega en WhatsApp. Además agrupa mal, porque quien
+reporta cambia —arrendatario, propietario, un familiar— mientras que el inmueble no. El número de
+contrato interno (`843A`) identifica el inmueble y su arrendamiento, no dice nada de nadie si se
+filtra, y todo inmueble arrendado tiene uno. Queda `mantenimientos/{contrato}/{aaaa-mm}-{radicado}/`:
+el contrato primero porque es lo que se busca, la fecha encabezando la carpeta para que el
+historial de cada inmueble salga ordenado con solo listarlo.
+
+Se pide obligatorio al arrendatario y opcional al propietario, que puede estar reportando sobre un
+inmueble desocupado. Exigirlo es viable porque **el número va en el encabezado del contrato de
+arrendamiento**, del que tienen copia las dos partes (confirmado por Inmobarco, 30-09-2026); si no
+estuviera al alcance del arrendatario, un campo obligatorio en el primer paso vaciaría el
+formulario. El sitio lo normaliza a mayúsculas y sin espacios —`843a` y `843A` no pueden
+ser dos carpetas— y solo admite letras, números y guiones, así que no puede salirse de una ruta.
+Lo que el sitio **no** puede hacer es comprobar que el contrato exista: eso le toca a n8n antes de
+usarlo como carpeta, o un dígito mal tecleado archiva la evidencia bajo el contrato de otro.
+
 **El sitio no archiva por radicado, y no puede.** Los archivos se suben mientras el usuario llena
 el formulario; el radicado lo asigna n8n al recibir el envío, después. Así que el sitio escribe en
 una bandeja de entrada agrupada por envío —`entrantes/{id-envio}/{uuid}.ext`, con un UUID que
