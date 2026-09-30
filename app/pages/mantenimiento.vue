@@ -7,6 +7,8 @@ import { CONTACT } from '#shared/data/legal'
  * Reporte de fallas para quien ya tiene contrato con Inmobarco. Sustituye a la
  * antigua página de PQRS (`docs/DECISIONS.md`, punto 48): el canal legal de
  * peticiones, quejas y reclamos sigue publicado en la política de tratamiento.
+ * No hay atajo de emergencia fuera del formulario: la urgencia se filtra
+ * internamente por tipo de avería.
  */
 const formEnabled = useFormsEnabled()
 </script>
@@ -38,23 +40,5 @@ const formEnabled = useFormsEnabled()
         </template>
       </div>
     </template>
-
-    <div class="mt-12 rounded-lg bg-surface p-6 md:p-8">
-      <h2 class="text-lg">
-        ¿Es una emergencia?
-      </h2>
-      <p class="mt-3 max-w-[62ch] text-muted">
-        Si hay riesgo para las personas o para el inmueble —una fuga de gas, un cable expuesto,
-        agua que no se puede cerrar— no esperes la respuesta del radicado: llámanos.
-      </p>
-      <div class="mt-6 flex flex-wrap gap-3">
-        <BaseButton :href="CONTACT.commercial.phoneHref">
-          Llamar al {{ CONTACT.commercial.phone.replace('+57 ', '') }}
-        </BaseButton>
-        <BaseButton :href="whatsappLink()" variant="ghost">
-          Escribir por WhatsApp
-        </BaseButton>
-      </div>
-    </div>
   </ContentPage>
 </template>

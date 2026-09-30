@@ -20,12 +20,12 @@ const scrolled = computed(() => y.value > 24)
     :class="scrolled ? 'shadow-sm' : ''"
   >
     <div
-      class="mx-auto flex max-w-page items-center gap-8 px-4 transition-all md:px-6"
+      class="mx-auto flex max-w-page items-center gap-4 px-4 xl:gap-8 transition-all md:px-6"
       :class="scrolled ? 'min-h-[58px]' : 'min-h-[74px]'"
     >
-      <NuxtLink to="/" class="flex items-center gap-2.5" aria-label="Inmobarco, inicio">
-        <BrandLogo />
-        <span class="font-display text-[1.3rem] font-bold tracking-[-0.03em]">inmobarco</span>
+      <NuxtLink to="/" class="flex items-center gap-3" aria-label="Inmobarco Inmobiliaria, inicio">
+        <BrandLogo :size="scrolled ? 44 : 54" class="transition-all" />
+        <span class="font-display whitespace-nowrap text-[1.05rem] font-bold leading-tight tracking-[-0.03em] sm:text-[1.3rem]">Inmobarco Inmobiliaria</span>
       </NuxtLink>
 
       <nav class="ml-auto hidden gap-7 text-[0.9375rem] font-medium lg:flex" aria-label="Principal">
