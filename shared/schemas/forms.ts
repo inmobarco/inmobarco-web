@@ -163,11 +163,16 @@ export function emptyContactForm(): ContactFormDraft {
 
 /** Taxonomía operativa de Inmobarco. Cada categoría enruta a un proveedor distinto. */
 export const MAINTENANCE_CATEGORIES = [
-  { value: 'electrico', label: 'Eléctrico', subcategories: ['Corto circuito', 'Toma o interruptor dañado', 'Falla de iluminación', 'Breaker o taco disparado', 'Otro'] },
-  { value: 'electrodomesticos', label: 'Electrodomésticos', subcategories: ['Nevera', 'Estufa', 'Lavadora', 'Calentador de agua', 'Otro'] },
-  { value: 'filtraciones', label: 'Filtraciones', subcategories: ['Techo', 'Baño', 'Cocina', 'Fachada o muro exterior', 'Otro'] },
-  { value: 'humedades', label: 'Humedades', subcategories: ['Pared', 'Techo', 'Piso', 'Otro'] },
-  { value: 'otros', label: 'Otros', subcategories: [] },
+  { value: 'humedades_filtraciones', label: 'Humedades y filtraciones', subcategories: ['Gotera activa', 'Mancha de humedad', 'Filtración por lluvia', 'Agua desde otro apartamento', 'Otro'] },
+  { value: 'plomeria', label: 'Plomería', subcategories: ['Fuga de agua', 'Sanitario', 'Lavamanos o lavaplatos', 'Ducha o grifería', 'Desagüe tapado', 'Otro'] },
+  { value: 'electrico', label: 'Eléctrico', subcategories: ['Corto o chispazo', 'Toma o interruptor', 'Iluminación', 'Breaker disparado', 'Sin energía en una parte', 'Otro'] },
+  { value: 'gas', label: 'Gas', subcategories: ['Olor a gas', 'Estufa no enciende', 'Sin servicio', 'Otro'] },
+  { value: 'electrodomesticos', label: 'Electrodomésticos', subcategories: ['Nevera', 'Estufa u horno', 'Campana extractora', 'Lavadora', 'Lavavajillas', 'Calentador de agua', 'Otro'] },
+  { value: 'puertas_ventanas', label: 'Puertas, ventanas y cerraduras', subcategories: ['Cerradura o chapa', 'Puerta', 'Ventana o vidrio', 'Otro'] },
+  { value: 'carpinteria', label: 'Carpintería', subcategories: ['Clóset', 'Cocina integral', 'Cajones o puertas de mueble', 'Otro'] },
+  { value: 'acabados', label: 'Pisos, paredes y acabados', subcategories: ['Piso o baldosa', 'Pintura', 'Grieta o fisura', 'Cielo raso', 'Otro'] },
+  { value: 'citofonia', label: 'Citofonía y comunicaciones', subcategories: ['Citófono o timbre', 'Punto de TV o internet', 'Otro'] },
+  { value: 'otro', label: 'Otro', subcategories: [] },
 ] as const
 
 export const MAINTENANCE_CLIENT_TYPES = [
