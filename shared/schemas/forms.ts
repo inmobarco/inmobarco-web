@@ -163,15 +163,104 @@ export function emptyContactForm(): ContactFormDraft {
 
 /** Taxonomía operativa de Inmobarco. Cada categoría enruta a un proveedor distinto. */
 export const MAINTENANCE_CATEGORIES = [
-  { value: 'humedades_filtraciones', label: 'Humedades y filtraciones', subcategories: ['Gotera activa', 'Mancha de humedad', 'Filtración por lluvia', 'Agua desde otro apartamento', 'Otro'] },
-  { value: 'plomeria', label: 'Plomería', subcategories: ['Fuga de agua', 'Sanitario', 'Lavamanos o lavaplatos', 'Ducha o grifería', 'Desagüe tapado', 'Otro'] },
-  { value: 'electrico', label: 'Eléctrico', subcategories: ['Corto o chispazo', 'Toma o interruptor', 'Iluminación', 'Breaker disparado', 'Sin energía en una parte', 'Otro'] },
-  { value: 'gas', label: 'Gas', subcategories: ['Olor a gas', 'Estufa no enciende', 'Sin servicio', 'Otro'] },
-  { value: 'electrodomesticos', label: 'Electrodomésticos', subcategories: ['Nevera', 'Estufa u horno', 'Campana extractora', 'Lavadora', 'Lavavajillas', 'Calentador de agua', 'Otro'] },
-  { value: 'puertas_ventanas', label: 'Puertas, ventanas y cerraduras', subcategories: ['Cerradura o chapa', 'Puerta', 'Ventana o vidrio', 'Otro'] },
-  { value: 'carpinteria', label: 'Carpintería', subcategories: ['Clóset', 'Cocina integral', 'Cajones o puertas de mueble', 'Otro'] },
-  { value: 'acabados', label: 'Pisos, paredes y acabados', subcategories: ['Piso o baldosa', 'Pintura', 'Grieta o fisura', 'Cielo raso', 'Otro'] },
-  { value: 'citofonia', label: 'Citofonía y comunicaciones', subcategories: ['Citófono o timbre', 'Punto de TV o internet', 'Otro'] },
+  {
+    value: 'humedades_filtraciones',
+    label: 'Humedades y filtraciones',
+    subcategories: [
+      { value: 'gotera_activa', label: 'Gotera activa' },
+      { value: 'mancha_humedad', label: 'Mancha de humedad' },
+      { value: 'filtracion_lluvia', label: 'Filtración por lluvia' },
+      { value: 'agua_otro_apartamento', label: 'Agua desde otro apartamento' },
+      { value: 'otro', label: 'Otro' },
+    ],
+  },
+  {
+    value: 'plomeria',
+    label: 'Plomería',
+    subcategories: [
+      { value: 'fuga_agua', label: 'Fuga de agua' },
+      { value: 'sanitario', label: 'Sanitario' },
+      { value: 'lavamanos_lavaplatos', label: 'Lavamanos o lavaplatos' },
+      { value: 'ducha_griferia', label: 'Ducha o grifería' },
+      { value: 'desague_tapado', label: 'Desagüe tapado' },
+      { value: 'otro', label: 'Otro' },
+    ],
+  },
+  {
+    value: 'electrico',
+    label: 'Eléctrico',
+    subcategories: [
+      { value: 'corto_chispazo', label: 'Corto o chispazo' },
+      { value: 'toma_interruptor', label: 'Toma o interruptor' },
+      { value: 'iluminacion', label: 'Iluminación' },
+      { value: 'breaker_disparado', label: 'Breaker disparado' },
+      { value: 'sin_energia_parcial', label: 'Sin energía en una parte' },
+      { value: 'otro', label: 'Otro' },
+    ],
+  },
+  {
+    value: 'gas',
+    label: 'Gas',
+    subcategories: [
+      { value: 'olor_gas', label: 'Olor a gas' },
+      { value: 'estufa_no_enciende', label: 'Estufa no enciende' },
+      { value: 'sin_servicio', label: 'Sin servicio' },
+      { value: 'otro', label: 'Otro' },
+    ],
+  },
+  {
+    value: 'electrodomesticos',
+    label: 'Electrodomésticos',
+    subcategories: [
+      { value: 'nevera', label: 'Nevera' },
+      { value: 'estufa_horno', label: 'Estufa u horno' },
+      { value: 'campana', label: 'Campana extractora' },
+      { value: 'lavadora', label: 'Lavadora' },
+      { value: 'lavavajillas', label: 'Lavavajillas' },
+      { value: 'calentador_agua', label: 'Calentador de agua' },
+      { value: 'otro', label: 'Otro' },
+    ],
+  },
+  {
+    value: 'puertas_ventanas',
+    label: 'Puertas, ventanas y cerraduras',
+    subcategories: [
+      { value: 'cerradura_chapa', label: 'Cerradura o chapa' },
+      { value: 'puerta', label: 'Puerta' },
+      { value: 'ventana_vidrio', label: 'Ventana o vidrio' },
+      { value: 'otro', label: 'Otro' },
+    ],
+  },
+  {
+    value: 'carpinteria',
+    label: 'Carpintería',
+    subcategories: [
+      { value: 'closet', label: 'Clóset' },
+      { value: 'cocina_integral', label: 'Cocina integral' },
+      { value: 'cajones_puertas', label: 'Cajones o puertas de mueble' },
+      { value: 'otro', label: 'Otro' },
+    ],
+  },
+  {
+    value: 'acabados',
+    label: 'Pisos, paredes y acabados',
+    subcategories: [
+      { value: 'piso_baldosa', label: 'Piso o baldosa' },
+      { value: 'pintura', label: 'Pintura' },
+      { value: 'grieta_fisura', label: 'Grieta o fisura' },
+      { value: 'cielo_raso', label: 'Cielo raso' },
+      { value: 'otro', label: 'Otro' },
+    ],
+  },
+  {
+    value: 'citofonia',
+    label: 'Citofonía y comunicaciones',
+    subcategories: [
+      { value: 'citofono_timbre', label: 'Citófono o timbre' },
+      { value: 'tv_internet', label: 'Punto de TV o internet' },
+      { value: 'otro', label: 'Otro' },
+    ],
+  },
   { value: 'otro', label: 'Otro', subcategories: [] },
 ] as const
 
@@ -330,6 +419,15 @@ export const maintenanceSchema = z.object({
       message: 'Escribe tu número de contrato',
     })
   }
+
+  /** El código de subcategoría solo vale dentro de su categoría: `otro` existe en casi todas. */
+  if (value.subcategory && !findMaintenanceSubcategory(value.category, value.subcategory)) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['subcategory'],
+      message: 'Elige una opción de la lista',
+    })
+  }
 })
 
 export type MaintenanceForm = z.infer<typeof maintenanceSchema>
@@ -368,4 +466,9 @@ export function emptyMaintenanceForm(): MaintenanceFormDraft {
 
 export function findMaintenanceCategory(value: string) {
   return MAINTENANCE_CATEGORIES.find(item => item.value === value)
+}
+
+export function findMaintenanceSubcategory(category: string, value: string) {
+  const subcategories: readonly { value: string, label: string }[] = findMaintenanceCategory(category)?.subcategories ?? []
+  return subcategories.find(item => item.value === value)
 }

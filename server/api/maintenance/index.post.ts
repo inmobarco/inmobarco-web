@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { findMaintenanceCategory, maintenanceSchema, MAINTENANCE_CLIENT_TYPES, MAINTENANCE_DAYS, MAINTENANCE_TIME_SLOTS } from '#shared/schemas/forms'
+import { findMaintenanceCategory, findMaintenanceSubcategory, maintenanceSchema, MAINTENANCE_CLIENT_TYPES, MAINTENANCE_DAYS, MAINTENANCE_TIME_SLOTS } from '#shared/schemas/forms'
 import { formsArePublishable } from '#shared/data/legal-documents'
 import { sendToN8n, verifyTurnstile } from '../../utils/n8n'
 import { INBOX_PREFIX } from '../../utils/r2'
@@ -74,6 +74,7 @@ export default defineEventHandler(async (event): Promise<MaintenanceResponse> =>
     category: body.category,
     categoryLabel: findMaintenanceCategory(body.category)?.label ?? body.category,
     subcategory: body.subcategory || null,
+    subcategoryLabel: body.subcategory ? findMaintenanceSubcategory(body.category, body.subcategory)?.label ?? body.subcategory : null,
     description: body.description,
 
     attachments: body.attachments,

@@ -305,7 +305,7 @@ function restart() {
 const subcategories = computed(() => {
   const category = findMaintenanceCategory(form.value.category)
   if (!category || category.subcategories.length === 0) return []
-  return category.subcategories.map(item => ({ value: item, label: item }))
+  return category.subcategories.map(item => ({ value: item.value, label: item.label }))
 })
 
 const isTenant = computed(() => form.value.clientType === 'arrendatario')

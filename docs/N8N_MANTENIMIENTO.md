@@ -49,7 +49,8 @@ Un `POST` con este cuerpo. Los campos son estables; el sitio ya los manda todos.
 
     "category": "humedades_filtraciones",
     "categoryLabel": "Humedades y filtraciones",
-    "subcategory": "Gotera activa",
+    "subcategory": "gotera_activa",
+    "subcategoryLabel": "Gotera activa",
     "description": "Gotera en el techo del baño desde hace tres días.",
 
     "attachments": [
