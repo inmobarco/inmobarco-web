@@ -420,8 +420,20 @@ export const maintenanceSchema = z.object({
     })
   }
 
-  /** El código de subcategoría solo vale dentro de su categoría: `otro` existe en casi todas. */
-  if (value.subcategory && !findMaintenanceSubcategory(value.category, value.subcategory)) {
+  /**
+   * Obligatoria cuando la categoría tiene opciones; la categoría `otro` no tiene
+   * ninguna y pasa sin ella. El código solo vale dentro de su categoría: `otro`
+   * existe en casi todas.
+   */
+  const hasSubcategories = (findMaintenanceCategory(value.category)?.subcategories.length ?? 0) > 0
+  if (hasSubcategories && !value.subcategory) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['subcategory'],
+      message: 'Elige qué tipo de falla es',
+    })
+  }
+  else if (value.subcategory && !findMaintenanceSubcategory(value.category, value.subcategory)) {
     ctx.addIssue({
       code: 'custom',
       path: ['subcategory'],

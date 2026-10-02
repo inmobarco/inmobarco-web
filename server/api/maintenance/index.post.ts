@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { findMaintenanceCategory, findMaintenanceSubcategory, maintenanceSchema, MAINTENANCE_CLIENT_TYPES, MAINTENANCE_DAYS, MAINTENANCE_TIME_SLOTS } from '#shared/schemas/forms'
 import { formsArePublishable } from '#shared/data/legal-documents'
 import { sendToN8n, verifyTurnstile } from '../../utils/n8n'
-import { INBOX_PREFIX } from '../../utils/r2'
+import { INBOX_PREFIX, r2Settings } from '../../utils/r2'
 
 export interface MaintenanceResponse {
   ok: true
@@ -39,6 +39,11 @@ export default defineEventHandler(async (event): Promise<MaintenanceResponse> =>
   // Honeypot: se responde como si todo hubiera ido bien y no se envía nada (§8.4).
   if (body.website) {
     return { ok: true, ticket: null }
+  }
+
+  // Evidencia obligatoria solo con R2 configurado; sin él el formulario sigue sin adjuntos.
+  if (r2Settings() && body.attachments.length === 0) {
+    throw createError({ statusCode: 400, statusMessage: 'Adjunta al menos una foto o un video de la falla' })
   }
 
   await verifyTurnstile(event, body.captchaToken)

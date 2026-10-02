@@ -250,6 +250,17 @@ async function goTo(next: number) {
 
 async function forward() {
   const found = issuesFor(STEP_FIELDS[step.value - 1] ?? [])
+
+  /**
+   * Al menos una evidencia, pero solo mientras los adjuntos estén habilitados:
+   * si R2 no está configurado, exigirla dejaría a todos sin poder reportar.
+   */
+  if (step.value === 3 && uploadsAvailable.value && attachments.value.length === 0) {
+    found.attachments = uploadsPending.value
+      ? 'Espera a que termine de subir el archivo'
+      : 'Adjunta al menos una foto o un video de la falla'
+  }
+
   errors.value = found
 
   if (Object.keys(found).length > 0) {
@@ -464,6 +475,7 @@ function progressLabel(item: Evidence): string {
             label="¿Qué es exactamente?"
             placeholder="Elige una opción"
             :options="subcategories"
+            required
             :error="errors.subcategory"
           />
 
@@ -483,8 +495,8 @@ function progressLabel(item: Evidence): string {
           Adjunta fotos o un video
         </h2>
         <p class="mt-2 text-sm text-muted">
-          Es opcional, pero con una foto el técnico llega sabiendo qué va a encontrar y casi
-          siempre se resuelve en una sola visita.
+          Necesitamos al menos una. Con una foto el técnico llega sabiendo qué va a encontrar y
+          casi siempre se resuelve en una sola visita.
         </p>
 
         <div v-if="!uploadsAvailable" class="mt-6 rounded-md border border-warning bg-warning-bg p-4 text-sm">
@@ -495,7 +507,10 @@ function progressLabel(item: Evidence): string {
         <template v-else>
           <button
             type="button"
-            class="mt-6 w-full rounded-md border border-dashed border-line bg-surface px-6 py-8 text-center hover:border-primary-400"
+            class="mt-6 w-full rounded-md border border-dashed bg-surface px-6 py-8 text-center hover:border-primary-400"
+            :class="errors.attachments ? 'border-error' : 'border-line'"
+            :aria-invalid="errors.attachments ? true : undefined"
+            :aria-describedby="errors.attachments ? 'attachments-error' : undefined"
             @click="pickFiles"
           >
             <span class="block font-semibold text-ink">Elegir archivos</span>
@@ -504,6 +519,10 @@ function progressLabel(item: Evidence): string {
               de máximo {{ formatBytes(MAINTENANCE_UPLOAD.video.maxBytes) }}
             </span>
           </button>
+
+          <p v-if="errors.attachments" id="attachments-error" class="mt-2 text-xs text-error">
+            {{ errors.attachments }}
+          </p>
 
           <input
             ref="fileInput"
