@@ -365,15 +365,15 @@ export const maintenanceSchema = z.object({
   ),
 
   /**
-   * La dirección es obligatoria y torre/apartamento no: el inventario tiene
-   * casas y locales, no solo unidades de conjunto. Pedir torre siempre dejaría
+   * La dirección es obligatoria y unidad/apartamento no: el inventario tiene
+   * casas y locales, no solo unidades de conjunto. Pedir unidad siempre dejaría
    * fuera a quien arrienda una casa.
    */
   contractNumber,
 
   propertyAddress: z.string().trim().min(5, 'Escribe la dirección del inmueble').max(160),
-  tower: z.string().trim().max(40).optional().or(z.literal('')),
-  unit: z.string().trim().max(40).optional().or(z.literal('')),
+  unit: z.string().trim().max(120).optional().or(z.literal('')),
+  aptNum: z.string().trim().max(40).optional().or(z.literal('')),
 
   category: z.enum(
     MAINTENANCE_CATEGORIES.map(item => item.value) as [string, ...string[]],
@@ -461,8 +461,8 @@ export function emptyMaintenanceForm(): MaintenanceFormDraft {
     phone: '',
     clientType: 'arrendatario',
     propertyAddress: '',
-    tower: '',
     unit: '',
+    aptNum: '',
     category: '',
     subcategory: '',
     description: '',

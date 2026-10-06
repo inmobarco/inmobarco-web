@@ -29,7 +29,7 @@ const STEPS = ['Tus datos', 'La falla', 'Evidencia', 'Disponibilidad']
 
 /** Qué campo se revisa en qué paso. El orden manda el foco al primer error. */
 const STEP_FIELDS: string[][] = [
-  ['name', 'documentNumber', 'email', 'phone', 'clientType', 'contractNumber', 'propertyAddress', 'tower', 'unit'],
+  ['name', 'documentNumber', 'email', 'phone', 'clientType', 'contractNumber', 'propertyAddress', 'unit', 'aptNum'],
   ['category', 'subcategory', 'description'],
   ['attachments'],
   ['availableDays', 'timeSlot', 'availabilityNotes', 'entryAuthorization', 'consent'],
@@ -423,8 +423,8 @@ function progressLabel(item: Evidence): string {
           />
 
           <div class="grid gap-5 sm:grid-cols-2">
-            <BaseInput v-model="form.tower" label="Torre o bloque" hint="Si aplica." :error="errors.tower" />
-            <BaseInput v-model="form.unit" label="Apartamento o interior" hint="Si aplica." :error="errors.unit" />
+            <BaseInput v-model="form.unit" label="Unidad o conjunto residencial" hint="Si aplica." :error="errors.unit" />
+            <BaseInput v-model="form.aptNum" label="Apartamento o interior" hint="Si aplica." :error="errors.aptNum" />
           </div>
         </div>
       </section>

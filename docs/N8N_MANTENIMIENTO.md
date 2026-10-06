@@ -44,8 +44,8 @@ Un `POST` con este cuerpo. Los campos son estables; el sitio ya los manda todos.
     "contractNumber": "843A",
 
     "propertyAddress": "Carrera 43A #5 Sur - 20",
-    "tower": "3",
-    "unit": "502",
+    "unit": "Conjunto Altos del Valle",
+    "aptNum": "502",
 
     "category": "humedades_filtraciones",
     "categoryLabel": "Humedades y filtraciones",

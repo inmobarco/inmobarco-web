@@ -73,8 +73,8 @@ export default defineEventHandler(async (event): Promise<MaintenanceResponse> =>
     contractNumber: body.contractNumber || null,
 
     propertyAddress: body.propertyAddress,
-    tower: body.tower || null,
     unit: body.unit || null,
+    aptNum: body.aptNum || null,
 
     category: body.category,
     categoryLabel: findMaintenanceCategory(body.category)?.label ?? body.category,
