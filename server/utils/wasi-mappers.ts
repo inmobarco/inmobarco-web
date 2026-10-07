@@ -98,23 +98,11 @@ function toFeatures(raw: WasiProperty): string[] {
   return [...new Set(names.filter(Boolean))]
 }
 
-function toCoords(raw: WasiProperty): { lat: number, lng: number } | undefined {
-  let lat = num(raw.latitude)
-  let lng = num(raw.longitude)
-
-  if (!lat || !lng) {
-    const [mapLat, mapLng] = text(raw.map).split(',')
-    lat = num(mapLat)
-    lng = num(mapLng)
-  }
-
-  if (!lat || !lng) return undefined
-  return { lat, lng }
-}
-
 /**
  * WasiProperty -> Property. Único punto donde se toca la forma cruda de Wasi
  * (manual §5.4): ningún componente recibe nunca el objeto original.
+ * La dirección y las coordenadas no se copian: el sitio no publica nada que
+ * permita ubicar el inmueble exacto, solo barrio y municipio.
  */
 export function toProperty(raw: WasiProperty): Property {
   const id = String(raw.id_property)
@@ -134,7 +122,6 @@ export function toProperty(raw: WasiProperty): Property {
     propertyType,
     city,
     zone,
-    address: text(raw.address) || undefined,
     price: {
       rent: rent > 0 ? rent : undefined,
       sale: sale > 0 ? sale : undefined,
@@ -153,7 +140,6 @@ export function toProperty(raw: WasiProperty): Property {
     description: plainText(raw.observations),
     features: toFeatures(raw),
     images: toImages(raw, title),
-    coords: toCoords(raw),
     code: id,
     updatedAt: toIsoDate(raw.updated_at) || toIsoDate(raw.created_at),
   }

@@ -37,13 +37,11 @@ export interface Property {
   propertyType: string
   city: string
   zone: string
-  address?: string
   price: PropertyPrice
   specs: PropertySpecs
   description: string
   features: string[]
   images: PropertyImage[]
-  coords?: { lat: number, lng: number }
   /** `id_property`, el código que el usuario ve y cita por WhatsApp. */
   code: string
   updatedAt: string

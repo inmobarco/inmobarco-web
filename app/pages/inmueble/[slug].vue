@@ -151,7 +151,6 @@ const relatedItems = computed(() =>
           </h1>
           <p class="mt-2 text-muted">
             {{ item.zone ? `${item.zone}, ${item.city}` : item.city }}
-            <template v-if="item.address"> · {{ item.address }}</template>
           </p>
 
           <p data-numeric class="mt-4 font-display text-[2rem] font-bold tracking-[-0.02em] lg:hidden">
