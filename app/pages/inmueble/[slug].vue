@@ -10,18 +10,20 @@ const { formatArea, formatPrice } = useFormatters()
 /** La URL es /inmueble/[slug]-[id]. Mandan los dígitos del final (§5.4). */
 const parsed = parsePropertyParam(String(route.params.slug))
 if (!parsed) {
-  throw createError({ statusCode: 404, statusMessage: 'Inmueble no encontrado', fatal: true })
+  // En SSR todo error ya pinta error.vue; `fatal` solo hace falta en navegación
+  // de cliente. Si va en el servidor, Nitro registra cada 404 como [fatal].
+  throw createError({ statusCode: 404, message: 'Inmueble no encontrado', fatal: import.meta.client })
 }
 
 const { data: property, error } = await useFetch<Property>(`/api/properties/${parsed.id}`)
 
 if (error.value) {
+  const notFound = error.value.statusCode === 404
   throw createError({
-    statusCode: error.value.statusCode === 404 ? 404 : 503,
-    statusMessage: error.value.statusCode === 404
-      ? 'Este inmueble ya no está disponible'
-      : 'No pudimos cargar el inmueble',
-    fatal: true,
+    statusCode: notFound ? 404 : 503,
+    message: notFound ? 'Este inmueble ya no está disponible' : 'No pudimos cargar el inmueble',
+    // Un 503 sí queda en el log: es un fallo real de Wasi, no un enlace viejo.
+    fatal: import.meta.client || !notFound,
   })
 }
 

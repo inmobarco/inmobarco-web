@@ -405,42 +405,44 @@ export const maintenanceSchema = z.object({
 
   website: honeypot,
   captchaToken: z.string().optional(),
-}).superRefine((value, ctx) => {
+})
   /**
    * Obligatorio para el arrendatario y opcional para el propietario: un
    * propietario puede reportar sobre un inmueble desocupado, que entre un
    * arrendamiento y el siguiente no tiene contrato vigente. Exigírselo lo
    * dejaría sin poder reportar.
    */
-  if (value.clientType === 'arrendatario' && !value.contractNumber) {
-    ctx.addIssue({
-      code: 'custom',
-      path: ['contractNumber'],
-      message: 'Escribe tu número de contrato',
-    })
-  }
-
+  .refine(value => value.clientType !== 'arrendatario' || Boolean(value.contractNumber), {
+    path: ['contractNumber'],
+    message: 'Escribe tu número de contrato',
+    when: fieldsAreValid('clientType', 'contractNumber'),
+  })
   /**
    * Obligatoria cuando la categoría tiene opciones; la categoría `otro` no tiene
    * ninguna y pasa sin ella. El código solo vale dentro de su categoría: `otro`
    * existe en casi todas.
    */
-  const hasSubcategories = (findMaintenanceCategory(value.category)?.subcategories.length ?? 0) > 0
-  if (hasSubcategories && !value.subcategory) {
-    ctx.addIssue({
-      code: 'custom',
-      path: ['subcategory'],
-      message: 'Elige qué tipo de falla es',
-    })
-  }
-  else if (value.subcategory && !findMaintenanceSubcategory(value.category, value.subcategory)) {
-    ctx.addIssue({
-      code: 'custom',
-      path: ['subcategory'],
-      message: 'Elige una opción de la lista',
-    })
-  }
-})
+  .refine(value => Boolean(value.subcategory) || !findMaintenanceCategory(value.category)?.subcategories.length, {
+    path: ['subcategory'],
+    message: 'Elige qué tipo de falla es',
+    when: fieldsAreValid('category', 'subcategory'),
+  })
+  .refine(value => !value.subcategory || Boolean(findMaintenanceSubcategory(value.category, value.subcategory)), {
+    path: ['subcategory'],
+    message: 'Elige una opción de la lista',
+    when: fieldsAreValid('category', 'subcategory'),
+  })
+
+/**
+ * Zod 4 salta los refinamientos del objeto en cuanto cualquier campo falla. El
+ * asistente valida paso a paso con el formulario entero, así que mientras los
+ * pasos siguientes estén vacíos estas reglas nunca correrían. Con `when` cada
+ * una corre apenas sus propios campos son válidos.
+ */
+function fieldsAreValid(...fields: string[]) {
+  return (payload: { issues: readonly { path?: readonly PropertyKey[] }[] }) =>
+    !payload.issues.some(issue => fields.includes(String(issue.path?.[0] ?? '')))
+}
 
 export type MaintenanceForm = z.infer<typeof maintenanceSchema>
 
