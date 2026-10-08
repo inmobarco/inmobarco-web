@@ -15,7 +15,7 @@ const formEnabled = useFormsEnabled()
 </script>
 
 <template>
-  <ContentPage :content="PROPIETARIOS">
+  <ContentPage :content="PROPIETARIOS" hide-pending-notice>
     <template #before-sections>
       <div class="mt-8 rounded-lg border border-line p-6 md:p-8">
         <h2 class="text-xl">
