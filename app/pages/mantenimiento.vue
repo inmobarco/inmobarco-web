@@ -14,7 +14,7 @@ const formEnabled = useFormsEnabled()
 </script>
 
 <template>
-  <ContentPage :content="MANTENIMIENTO_PAGE">
+  <ContentPage :content="MANTENIMIENTO_PAGE" hide-pending-notice>
     <template #before-sections>
       <div class="mt-8 rounded-lg border border-line p-6 md:p-8">
         <template v-if="formEnabled">

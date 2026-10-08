@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import type { ContentPage } from '#shared/data/pages'
 
-const props = defineProps<{ content: ContentPage }>()
+const props = withDefaults(defineProps<{
+  content: ContentPage
+  /** Oculta el aviso visual de pendiente; la página sigue saliendo `noindex`. */
+  hidePendingNotice?: boolean
+}>(), { hidePendingNotice: false })
 
 const route = useRoute()
 const site = useSiteConfig()
@@ -36,7 +40,7 @@ useSchemaOrg(computed(() => [
         {{ content.intro }}
       </p>
 
-      <PendingNotice v-if="content.pending" class="mt-8" />
+      <PendingNotice v-if="content.pending && !hidePendingNotice" class="mt-8" />
 
       <!-- Bloque libre para lo que cada página añade sobre el contenido base -->
       <slot name="before-sections" />
