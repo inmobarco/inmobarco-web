@@ -407,17 +407,6 @@ export const maintenanceSchema = z.object({
   captchaToken: z.string().optional(),
 })
   /**
-   * Obligatorio para el arrendatario y opcional para el propietario: un
-   * propietario puede reportar sobre un inmueble desocupado, que entre un
-   * arrendamiento y el siguiente no tiene contrato vigente. Exigírselo lo
-   * dejaría sin poder reportar.
-   */
-  .refine(value => value.clientType !== 'arrendatario' || Boolean(value.contractNumber), {
-    path: ['contractNumber'],
-    message: 'Escribe tu número de contrato',
-    when: fieldsAreValid('clientType', 'contractNumber'),
-  })
-  /**
    * Obligatoria cuando la categoría tiene opciones; la categoría `otro` no tiene
    * ninguna y pasa sin ella. El código solo vale dentro de su categoría: `otro`
    * existe en casi todas.

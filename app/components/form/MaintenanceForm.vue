@@ -319,8 +319,6 @@ const subcategories = computed(() => {
   return category.subcategories.map(item => ({ value: item.value, label: item.label }))
 })
 
-const isTenant = computed(() => form.value.clientType === 'arrendatario')
-
 function chooseCategory(value: string) {
   form.value.category = value
   form.value.subcategory = ''
@@ -400,15 +398,13 @@ function progressLabel(item: Evidence): string {
           />
 
           <!--
-            El número de contrato es lo que deja archivar la evidencia por
-            inmueble. Se pide al arrendatario y no al propietario, que puede
-            estar reportando sobre un inmueble desocupado.
+            El número de contrato ayuda a archivar la evidencia por inmueble,
+            pero es opcional: no todos lo tienen a mano al reportar una falla.
           -->
           <BaseInput
             v-model="form.contractNumber"
-            :label="isTenant ? 'Número de contrato' : 'Número de contrato (si el inmueble está arrendado)'"
+            label="Número de contrato (opcional)"
             placeholder="843A"
-            :required="isTenant"
             hint="Aparece en el encabezado de tu contrato de arrendamiento."
             :error="errors.contractNumber"
           />
