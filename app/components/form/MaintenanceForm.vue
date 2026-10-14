@@ -12,6 +12,7 @@ import {
   uploadKindFor,
   type MaintenanceAttachment,
 } from '#shared/schemas/forms'
+import { ZONES } from '#shared/data/taxonomy'
 import type { MaintenanceResponse } from '../../../server/api/maintenance/index.post'
 import type { UploadUrlResponse } from '../../../server/api/maintenance/upload-url.post'
 
@@ -29,7 +30,7 @@ const STEPS = ['Tus datos', 'La falla', 'Evidencia', 'Disponibilidad']
 
 /** Qué campo se revisa en qué paso. El orden manda el foco al primer error. */
 const STEP_FIELDS: string[][] = [
-  ['name', 'documentNumber', 'email', 'phone', 'clientType', 'contractNumber', 'propertyAddress', 'unit', 'aptNum'],
+  ['name', 'documentNumber', 'email', 'phone', 'clientType', 'city', 'propertyAddress', 'unit', 'aptNum'],
   ['category', 'subcategory', 'description'],
   ['attachments'],
   ['availableDays', 'timeSlot', 'availabilityNotes', 'entryAuthorization', 'consent'],
@@ -319,6 +320,11 @@ const subcategories = computed(() => {
   return category.subcategories.map(item => ({ value: item.value, label: item.label }))
 })
 
+const cityOptions = [
+  ...ZONES.map(zone => ({ value: zone.slug, label: zone.name })),
+  { value: 'otro', label: 'Otro municipio' },
+]
+
 function chooseCategory(value: string) {
   form.value.category = value
   form.value.subcategory = ''
@@ -397,16 +403,13 @@ function progressLabel(item: Evidence): string {
             :error="errors.clientType"
           />
 
-          <!--
-            El número de contrato ayuda a archivar la evidencia por inmueble,
-            pero es opcional: no todos lo tienen a mano al reportar una falla.
-          -->
-          <BaseInput
-            v-model="form.contractNumber"
-            label="Número de contrato (opcional)"
-            placeholder="843A"
-            hint="Aparece en el encabezado de tu contrato de arrendamiento."
-            :error="errors.contractNumber"
+          <BaseSelect
+            v-model="form.city"
+            label="Municipio"
+            placeholder="Elige una opción"
+            :options="cityOptions"
+            required
+            :error="errors.city"
           />
 
           <BaseInput
@@ -414,7 +417,7 @@ function progressLabel(item: Evidence): string {
             label="Dirección del inmueble"
             autocomplete="street-address"
             placeholder="Carrera 43A #5 Sur - 20"
-            required
+            hint="Si aplica."
             :error="errors.propertyAddress"
           />
 

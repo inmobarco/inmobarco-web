@@ -321,26 +321,6 @@ export const maintenanceAttachmentSchema = z.object({
 
 export type MaintenanceAttachment = z.infer<typeof maintenanceAttachmentSchema>
 
-/**
- * Número de contrato interno de Inmobarco, del estilo `843A`. Todo inmueble
- * arrendado tiene uno, y a diferencia de la cédula identifica **el inmueble y su
- * arrendamiento**, que es lo que tiene continuidad: el arrendatario cambia, el
- * contrato no.
- *
- * Se normaliza a mayúsculas y sin espacios porque es lo que acaba siendo el
- * nombre de una carpeta en el bucket, y `843a` y `843A` no pueden ser dos
- * carpetas distintas. El formato está deliberadamente holgado —dígitos, letras
- * y guiones— para que un contrato con otra forma no rebote; lo que no admite es
- * nada que pueda salirse de una ruta.
- */
-const contractNumber = z.string()
-  .trim()
-  .transform(value => value.toUpperCase().replace(/\s+/g, ''))
-  .refine(
-    value => value === '' || /^[A-Z0-9-]{2,12}$/.test(value),
-    'El número de contrato solo lleva letras, números y guiones',
-  )
-
 const documentNumber = z.string()
   .trim()
   .min(5, 'Escribe tu número de documento')
@@ -364,14 +344,15 @@ export const maintenanceSchema = z.object({
     'Dinos si eres arrendatario o propietario',
   ),
 
-  /**
-   * La dirección es obligatoria y unidad/apartamento no: el inventario tiene
-   * casas y locales, no solo unidades de conjunto. Pedir unidad siempre dejaría
-   * fuera a quien arrienda una casa.
-   */
-  contractNumber,
+  /** Slug de `ZONES`, u `otro`. Mismo criterio que en el formulario de consignación. */
+  city: z.string().trim().min(1, 'Elige el municipio').max(40),
 
-  propertyAddress: z.string().trim().min(5, 'Escribe la dirección del inmueble').max(160),
+  /**
+   * Dirección, unidad y apartamento son opcionales: el municipio basta para
+   * enrutar el reporte, y el inventario tiene casas y locales, no solo unidades
+   * de conjunto.
+   */
+  propertyAddress: z.string().trim().max(160).optional().or(z.literal('')),
   unit: z.string().trim().max(120).optional().or(z.literal('')),
   aptNum: z.string().trim().max(40).optional().or(z.literal('')),
 
@@ -446,11 +427,11 @@ export function emptyMaintenanceForm(): MaintenanceFormDraft {
   return {
     submissionId: crypto.randomUUID(),
     name: '',
-    contractNumber: '',
     documentNumber: '',
     email: '',
     phone: '',
     clientType: 'arrendatario',
+    city: '',
     propertyAddress: '',
     unit: '',
     aptNum: '',

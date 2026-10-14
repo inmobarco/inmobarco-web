@@ -666,6 +666,20 @@ se disparó para no llenar de pruebas la bandeja de Inmobarco), la subida real c
 R2, y el CORS del bucket, que hay que configurar para que el navegador pueda hacer `PUT` desde el
 dominio del sitio.
 
+## 2026-10-14 — Ajustes al formulario de mantenimiento
+
+### 49. Sale el número de contrato, entra el municipio
+
+Por pedido de Inmobarco:
+
+- **Se quita el número de contrato** del formulario. La clave `contractNumber` se mantiene en
+  el payload, siempre en `null`, para no romper el flujo de n8n. Esto deja sin efecto el criterio del punto 48 de archivar la evidencia por
+  contrato: mientras n8n no identifique el contrato por otra vía (cédula + dirección, por
+  ejemplo), todo reporte cae en `mantenimientos/sin-contrato/…`.
+- **La dirección pasa a ser opcional.** Llega `null` en el payload si viene vacía.
+- **Se añade el municipio, obligatorio**, con las mismas opciones que el formulario de
+  consignación (`ZONES` + «Otro municipio»). Llega como `city` (slug u `otro`) y `cityLabel`.
+
 ## Pendientes de verificar
 
 - **Destacados de la home** — decisión de producto pendiente (ver punto 9).

@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { findMaintenanceCategory, findMaintenanceSubcategory, maintenanceSchema, MAINTENANCE_CLIENT_TYPES, MAINTENANCE_DAYS, MAINTENANCE_TIME_SLOTS } from '#shared/schemas/forms'
 import { formsArePublishable } from '#shared/data/legal-documents'
+import { findZone } from '#shared/data/taxonomy'
 import { sendToN8n, verifyTurnstile } from '../../utils/n8n'
 import { INBOX_PREFIX, r2Settings } from '../../utils/r2'
 
@@ -64,15 +65,12 @@ export default defineEventHandler(async (event): Promise<MaintenanceResponse> =>
     clientType: body.clientType,
     clientTypeLabel: label(MAINTENANCE_CLIENT_TYPES, body.clientType),
 
-    /**
-     * Ya normalizado a mayúsculas. **n8n tiene que comprobarlo contra la lista
-     * real de contratos antes de usarlo como carpeta**: el sitio no tiene forma
-     * de verificar que exista, y un dígito mal tecleado archivaría la evidencia
-     * bajo un contrato ajeno.
-     */
-    contractNumber: body.contractNumber || null,
+    /** El formulario ya no lo pide; se mantiene la clave para no romper el flujo de n8n. */
+    contractNumber: null,
 
-    propertyAddress: body.propertyAddress,
+    city: body.city,
+    cityLabel: findZone(body.city)?.name ?? 'Otro municipio',
+    propertyAddress: body.propertyAddress || null,
     unit: body.unit || null,
     aptNum: body.aptNum || null,
 

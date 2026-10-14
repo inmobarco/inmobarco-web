@@ -41,8 +41,10 @@ Un `POST` con este cuerpo. Los campos son estables; el sitio ya los manda todos.
     "clientType": "arrendatario",
     "clientTypeLabel": "Arrendatario",
 
-    "contractNumber": "843A",
+    "contractNumber": null,
 
+    "city": "sabaneta",
+    "cityLabel": "Sabaneta",
     "propertyAddress": "Carrera 43A #5 Sur - 20",
     "unit": "Conjunto Altos del Valle",
     "aptNum": "502",
@@ -84,9 +86,11 @@ Un `POST` con este cuerpo. Los campos son estables; el sitio ya los manda todos.
 
 Notas sobre campos concretos:
 
-- **`contractNumber`** es el identificador interno del contrato de arrendamiento, del
-  estilo `843A`. Llega ya normalizado a mayúsculas y sin espacios. Puede ser `null`
-  cuando quien reporta es un propietario con el inmueble desocupado.
+- **`city`** es el slug del municipio (`sabaneta`, `envigado`, …) u `otro`. Siempre
+  viene; `cityLabel` trae el nombre legible.
+- **`propertyAddress`**, **`unit`** y **`aptNum`** son opcionales y pueden llegar `null`.
+- **`contractNumber`** siempre llega `null`: el formulario ya no lo pide, pero la clave se
+  mantiene para no romper el flujo (`docs/DECISIONS.md`, punto 49).
 - **`attachments`** puede venir vacío: los adjuntos son opcionales.
 - **`attachmentPrefix`** es la carpeta exacta del bucket donde están esos archivos, o
   `null` si no hay ninguno.
@@ -171,6 +175,10 @@ radicado en el nombre. Mientras el webhook devuelva siempre el mismo número, to
 reportes se archivan en la misma carpeta.
 
 ### 2. Verificar el número de contrato
+
+> **Desde el 14-10-2026 el formulario ya no pide el número de contrato** (punto 49 de
+> `docs/DECISIONS.md`). Hasta que n8n lo resuelva por otra vía, todo reporte va a
+> `mantenimientos/sin-contrato/…`. Lo que sigue aplica cuando se tenga el contrato.
 
 **Este paso no se puede saltar.** El sitio comprueba que `contractNumber` tenga forma
 válida y que no pueda salirse de una ruta, pero **no tiene forma de saber si el contrato
