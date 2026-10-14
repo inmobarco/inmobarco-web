@@ -677,8 +677,10 @@ Por pedido de Inmobarco:
   contrato: mientras n8n no identifique el contrato por otra vía (cédula + dirección, por
   ejemplo), todo reporte cae en `mantenimientos/sin-contrato/…`.
 - **La dirección pasa a ser opcional.** Llega `null` en el payload si viene vacía.
-- **Se añade el municipio, obligatorio**, con las mismas opciones que el formulario de
-  consignación (`ZONES` + «Otro municipio»). Llega como `city` (slug u `otro`) y `cityLabel`.
+- **Se añade el municipio, obligatorio**, con las opciones de `MAINTENANCE_CITIES`: los
+  municipios de `ZONES`, Bello y «Otro municipio». Llega como `city` (slug) y `cityLabel`.
+  Bello va solo en esta lista y no en `ZONES`: allí crearía `/arriendo/bello` y necesitaría
+  su `id_city` de Wasi, sin inventario que lo respalde.
 
 ## Pendientes de verificar
 

@@ -4,6 +4,7 @@ import {
   emptyMaintenanceForm,
   findMaintenanceCategory,
   MAINTENANCE_CATEGORIES,
+  MAINTENANCE_CITIES,
   MAINTENANCE_CLIENT_TYPES,
   MAINTENANCE_DAYS,
   MAINTENANCE_TIME_SLOTS,
@@ -12,7 +13,6 @@ import {
   uploadKindFor,
   type MaintenanceAttachment,
 } from '#shared/schemas/forms'
-import { ZONES } from '#shared/data/taxonomy'
 import type { MaintenanceResponse } from '../../../server/api/maintenance/index.post'
 import type { UploadUrlResponse } from '../../../server/api/maintenance/upload-url.post'
 
@@ -320,11 +320,6 @@ const subcategories = computed(() => {
   return category.subcategories.map(item => ({ value: item.value, label: item.label }))
 })
 
-const cityOptions = [
-  ...ZONES.map(zone => ({ value: zone.slug, label: zone.name })),
-  { value: 'otro', label: 'Otro municipio' },
-]
-
 function chooseCategory(value: string) {
   form.value.category = value
   form.value.subcategory = ''
@@ -407,7 +402,7 @@ function progressLabel(item: Evidence): string {
             v-model="form.city"
             label="Municipio"
             placeholder="Elige una opción"
-            :options="cityOptions"
+            :options="MAINTENANCE_CITIES"
             required
             :error="errors.city"
           />

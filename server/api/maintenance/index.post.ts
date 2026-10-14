@@ -1,7 +1,6 @@
 import { z } from 'zod'
-import { findMaintenanceCategory, findMaintenanceSubcategory, maintenanceSchema, MAINTENANCE_CLIENT_TYPES, MAINTENANCE_DAYS, MAINTENANCE_TIME_SLOTS } from '#shared/schemas/forms'
+import { findMaintenanceCategory, findMaintenanceSubcategory, maintenanceSchema, MAINTENANCE_CITIES, MAINTENANCE_CLIENT_TYPES, MAINTENANCE_DAYS, MAINTENANCE_TIME_SLOTS } from '#shared/schemas/forms'
 import { formsArePublishable } from '#shared/data/legal-documents'
-import { findZone } from '#shared/data/taxonomy'
 import { sendToN8n, verifyTurnstile } from '../../utils/n8n'
 import { INBOX_PREFIX, r2Settings } from '../../utils/r2'
 
@@ -69,7 +68,7 @@ export default defineEventHandler(async (event): Promise<MaintenanceResponse> =>
     contractNumber: null,
 
     city: body.city,
-    cityLabel: findZone(body.city)?.name ?? 'Otro municipio',
+    cityLabel: label(MAINTENANCE_CITIES, body.city),
     propertyAddress: body.propertyAddress || null,
     unit: body.unit || null,
     aptNum: body.aptNum || null,

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { ZONES } from '../data/taxonomy'
 
 /**
  * Esquemas de formulario, compartidos entre cliente y servidor (manual §8.1).
@@ -269,6 +270,17 @@ export const MAINTENANCE_CLIENT_TYPES = [
   { value: 'propietario', label: 'Propietario' },
 ] as const
 
+/**
+ * Municipios del reporte de mantenimiento: los de `ZONES` más los que se
+ * administran sin inventario publicado. Bello va aquí y no en `ZONES` porque
+ * allí generaría una URL de listado y necesitaría su `id_city` de Wasi.
+ */
+export const MAINTENANCE_CITIES: { value: string, label: string }[] = [
+  ...ZONES.map(zone => ({ value: zone.slug, label: zone.name })),
+  { value: 'bello', label: 'Bello' },
+  { value: 'otro', label: 'Otro municipio' },
+]
+
 export const MAINTENANCE_DAYS = [
   { value: 'lun', label: 'Lunes' },
   { value: 'mar', label: 'Martes' },
@@ -344,8 +356,11 @@ export const maintenanceSchema = z.object({
     'Dinos si eres arrendatario o propietario',
   ),
 
-  /** Slug de `ZONES`, u `otro`. Mismo criterio que en el formulario de consignación. */
-  city: z.string().trim().min(1, 'Elige el municipio').max(40),
+  /** Valor de `MAINTENANCE_CITIES`. */
+  city: z.string().trim().min(1, 'Elige el municipio').refine(
+    value => MAINTENANCE_CITIES.some(item => item.value === value),
+    'Elige el municipio',
+  ),
 
   /**
    * Dirección, unidad y apartamento son opcionales: el municipio basta para

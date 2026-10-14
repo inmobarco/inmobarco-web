@@ -86,7 +86,8 @@ Un `POST` con este cuerpo. Los campos son estables; el sitio ya los manda todos.
 
 Notas sobre campos concretos:
 
-- **`city`** es el slug del municipio (`sabaneta`, `envigado`, …) u `otro`. Siempre
+- **`city`** es el slug del municipio: `sabaneta`, `la-estrella`, `medellin`, `itagui`,
+  `envigado`, `bello` u `otro`. Siempre
   viene; `cityLabel` trae el nombre legible.
 - **`propertyAddress`**, **`unit`** y **`aptNum`** son opcionales y pueden llegar `null`.
 - **`contractNumber`** siempre llega `null`: el formulario ya no lo pide, pero la clave se
