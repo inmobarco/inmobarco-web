@@ -417,8 +417,8 @@ function progressLabel(item: Evidence): string {
           />
 
           <div class="grid gap-5 sm:grid-cols-2">
-            <BaseInput v-model="form.unit" label="Unidad o conjunto residencial" hint="Si aplica." :error="errors.unit" />
-            <BaseInput v-model="form.aptNum" label="Apartamento o interior" hint="Si aplica." :error="errors.aptNum" />
+            <BaseInput v-model="form.unit" label="Unidad o conjunto residencial" required :error="errors.unit" />
+            <BaseInput v-model="form.aptNum" label="Apartamento o interior" required :error="errors.aptNum" />
           </div>
         </div>
       </section>

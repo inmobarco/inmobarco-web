@@ -363,13 +363,12 @@ export const maintenanceSchema = z.object({
   ),
 
   /**
-   * Dirección, unidad y apartamento son opcionales: el municipio basta para
-   * enrutar el reporte, y el inventario tiene casas y locales, no solo unidades
-   * de conjunto.
+   * La dirección es opcional; unidad y apartamento son obligatorios por pedido
+   * de Inmobarco (`docs/DECISIONS.md`, punto 49).
    */
   propertyAddress: z.string().trim().max(160).optional().or(z.literal('')),
-  unit: z.string().trim().max(120).optional().or(z.literal('')),
-  aptNum: z.string().trim().max(40).optional().or(z.literal('')),
+  unit: z.string().trim().min(1, 'Escribe la unidad o conjunto residencial').max(120),
+  aptNum: z.string().trim().min(1, 'Escribe el apartamento o interior').max(40),
 
   category: z.enum(
     MAINTENANCE_CATEGORIES.map(item => item.value) as [string, ...string[]],

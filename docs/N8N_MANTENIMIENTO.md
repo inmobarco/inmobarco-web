@@ -89,7 +89,8 @@ Notas sobre campos concretos:
 - **`city`** es el slug del municipio: `sabaneta`, `la-estrella`, `medellin`, `itagui`,
   `envigado`, `bello` u `otro`. Siempre
   viene; `cityLabel` trae el nombre legible.
-- **`propertyAddress`**, **`unit`** y **`aptNum`** son opcionales y pueden llegar `null`.
+- **`propertyAddress`** es opcional y puede llegar `null`. **`unit`** y **`aptNum`**
+  siempre vienen.
 - **`contractNumber`** siempre llega `null`: el formulario ya no lo pide, pero la clave se
   mantiene para no romper el flujo (`docs/DECISIONS.md`, punto 49).
 - **`attachments`** puede venir vacío: los adjuntos son opcionales.

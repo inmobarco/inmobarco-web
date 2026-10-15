@@ -70,8 +70,8 @@ export default defineEventHandler(async (event): Promise<MaintenanceResponse> =>
     city: body.city,
     cityLabel: label(MAINTENANCE_CITIES, body.city),
     propertyAddress: body.propertyAddress || null,
-    unit: body.unit || null,
-    aptNum: body.aptNum || null,
+    unit: body.unit,
+    aptNum: body.aptNum,
 
     category: body.category,
     categoryLabel: findMaintenanceCategory(body.category)?.label ?? body.category,

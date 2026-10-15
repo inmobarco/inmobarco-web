@@ -677,6 +677,8 @@ Por pedido de Inmobarco:
   contrato: mientras n8n no identifique el contrato por otra vía (cédula + dirección, por
   ejemplo), todo reporte cae en `mantenimientos/sin-contrato/…`.
 - **La dirección pasa a ser opcional.** Llega `null` en el payload si viene vacía.
+- **Unidad y apartamento pasan a ser obligatorios** (15-10-2026), al revés de lo que fijaba el
+  punto 48. Quien reporte desde una casa o un local tendrá que escribir algo en ambos campos.
 - **Se añade el municipio, obligatorio**, con las opciones de `MAINTENANCE_CITIES`: los
   municipios de `ZONES`, Bello y «Otro municipio». Llega como `city` (slug) y `cityLabel`.
   Bello va solo en esta lista y no en `ZONES`: allí crearía `/arriendo/bello` y necesitaría
